@@ -27,7 +27,7 @@ You can write **bold**, *italic*, ~~strikethrough~~, and `inline code` easily.
 
 ## Image
 
-![Nanowakeword training graph](https://raw.githubusercontent.com/arcosoph/nanowakeword/main/assets/Graphs/training_performance_graph.png)
+![Nanowakeword training graph](https://pub-812e108f164d4805821c37cb3d3810f1.r2.dev/images/common/training_performance_graph.png)
 
 ## Blockquote
 
