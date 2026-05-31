@@ -1,0 +1,3397 @@
+<!-- 
+##########################################################
+# ⚠️ Proprietary Code – Unauthorized copying prohibited #
+# Author: Arcosoph                                      #
+# All rights reserved                                   #
+##########################################################
+-->
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Editor with Live HTML Preview — Export HTML & CSS | Sophmark</title>
+  <meta name="description" content="Free online Markdown editor. Write Markdown, see live HTML preview. Export your HTML with CSS styles or as plain HTML. Markdown to HTML. Built by Arcosoph.">
+  <meta name="keywords" content="sophmark, markdown, md, html, converter, tool, free, markdown to html, md to html, css"> 
+  <link rel="canonical" href="https://arcosoph.com/sophmark.html">
+  <meta name="author" content="Arcosoph">
+  
+  <!-- Favicons -->
+  <!-- Standard favicon for browsers -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+
+  <!-- PNG icons for specific resolutions -->
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+
+  <!-- Shortcut icon for legacy browsers -->
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="https://arcosoph.com/https://pub-812e108f164d4805821c37cb3d3810f1.r2.dev/images/arcosoph/logo/Arcosoph_Logo_square.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ed-bg:        #f7f7f5;
+      --ed-surface:   #ffffff;
+      --ed-surface2:  #f0efec;
+      --ed-border:    #e2e0db;
+      --ed-border2:   #d0cdc6;
+      --ed-text:      #1a1916;
+      --ed-text2:     #6b6860;
+      --ed-text3:     #9e9b94;
+      --ed-accent:    #1a6b3a;
+      --ed-accent-s:  #e8f5ee;
+      --ed-accent2:   #0f4d28;
+      --ed-mono:      'DM Mono', monospace;
+      --ed-sans:      'DM Sans', sans-serif;
+      --ed-radius:    6px;
+      --ed-toolbar-h: 42px;
+      --ed-status-h:  26px;
+    }
+    [data-theme="dark"] {
+      --ed-bg:        #141412 !important;
+      --ed-surface:   #1e1d1b !important;
+      --ed-surface2:  #272521 !important;
+      --ed-border:    #2e2c28 !important;
+      --ed-border2:   #3a3834 !important;
+      --ed-text:      #e8e6e1 !important;
+      --ed-text2:     #9e9b94 !important;
+      --ed-text3:     #6b6860 !important;
+      --ed-accent:    #3dba6e !important;
+      --ed-accent-s:  #1a3326 !important;
+      --ed-accent2:   #56d484 !important;
+    }
+
+
+    body, html {
+      font-family: var(--ed-sans);
+      background: var(--ed-bg) !important;
+      color: var(--ed-text);
+      margin: 0 !important;
+      padding: 0 !important;
+      /* removed fixed heights and overflow constraints to allow normal page scrolling to footer */
+    }
+
+    /* Remove native scrollbars so they don't look weird */
+    ::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+    }
+    
+    .show-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .show-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--ed-border2);
+      border-radius: 4px;
+    }
+    .show-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* Hide Vertical Scrollbar for Preview Pane */
+    .preview-scroll::-webkit-scrollbar {
+      width: 0px !important; 
+    }
+
+    .editor-layout {
+      width: 100%;
+      display: flex;
+      min-height: calc(100vh - 102px);
+    }
+    .editor-subbar {
+      height: 40px;
+      background: var(--ed-surface);
+      border-bottom: 1px solid var(--ed-border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .editor-subbar-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ed-text2);
+      letter-spacing: .03em;
+    }
+    .subbar-sep { width: 1px; height: 18px; background: var(--ed-border2); }
+    .subbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+    .sub-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 27px; padding: 0 10px;
+      border-radius: var(--ed-radius);
+      border: 1px solid var(--ed-border2);
+      background: var(--ed-surface);
+      color: var(--ed-text2);
+      font-size: 12px; font-family: var(--ed-sans); font-weight: 500;
+      cursor: pointer; transition: all .13s; white-space: nowrap;
+    }
+    .sub-btn:hover { background: var(--ed-surface2); color: var(--ed-text); }
+    .sub-btn.primary { background: var(--ed-accent); color: #fff; border-color: var(--ed-accent); }
+    .sub-btn.primary:hover { background: var(--ed-accent2); border-color: var(--ed-accent2); }
+
+
+    .pane {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .pane + .pane { border-left: 1px solid var(--ed-border); }
+
+    .pane-toolbar {
+          height: var(--ed-toolbar-h);
+          background: var(--ed-surface);
+          border-bottom: 1px solid var(--ed-border);
+          display: flex; align-items: center;
+          padding: 0 8px; gap: 1px; flex-shrink: 0;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        
+        /* === EIKHANE NOTUN CODE-TA ADD KORUN === */
+        #left-pane .pane-toolbar {
+          position: -webkit-sticky; /* For Safari browser */
+          position: sticky;
+          /* top: 60px; Main navbar-er height */
+          top: var(--sophmark-sticky-offset, 0px); 
+          z-index: 10;
+        }
+        /* === NOTUN CODE ADD KORA SHESH === */
+
+        .pane-toolbar::-webkit-scrollbar {
+          display: none;
+        }
+
+    .pane-label {
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase;
+      color: var(--ed-text3); padding: 0 6px; margin-right: 4px;
+    }
+    .tsep { width: 1px; height: 17px; background: var(--ed-border); margin: 0 3px; }
+    .tbtn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 4px; height: 27px; padding: 0 7px;
+      border-radius: var(--ed-radius); border: none;
+      background: transparent; color: var(--ed-text2);
+      font-size: 11.5px; font-family: var(--ed-sans); font-weight: 500;
+      cursor: pointer; transition: all .12s; white-space: nowrap;
+    }
+    .tbtn:hover { background: var(--ed-surface2); color: var(--ed-text); }
+    .tbtn.active { background: var(--ed-accent-s); color: var(--ed-accent); }
+    .tbtn svg { flex-shrink: 0; }
+    .tright { margin-left: auto; display: flex; align-items: center; gap: 1px; }
+
+    /* .pane-body {
+      flex: 1 1 auto; 
+      position: relative;
+    } */
+
+    .pane-body {
+      flex: 1 1 auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #md-input {
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 400px;
+      padding: 20px 22px;
+
+      border: none; outline: none; resize: none;
+      background: var(--ed-surface); color: var(--ed-text);
+      font-family: var(--ed-mono); font-size: 13.5px; line-height: 1.8;
+      tab-size: 2;
+
+    }
+
+
+    #md-input::placeholder { color: var(--ed-text3); }
+
+    /* highlight overlay on textarea — we use a highlight div instead */
+    .editor-highlight-line {
+      position: absolute; left: 0; right: 0;
+      background: rgba(26, 107, 58, 0.07);
+      border-left: 3px solid var(--ed-accent);
+      pointer-events: none;
+      transition: top .08s, height .08s, opacity .12s;
+      opacity: 0;
+    }
+    [data-theme="dark"] .editor-highlight-line {
+      background: rgba(61, 186, 110, 0.09);
+    }
+
+
+    .preview-scroll {
+      background: var(--ed-surface);
+      padding: 24px 30px;
+      flex: 1;
+      overflow: auto;
+    }
+
+    #html-source-wrap {
+      flex: 1; overflow: auto;
+      background: var(--ed-surface);
+      min-height: 0; display: none;
+    }
+    #html-source-wrap.visible { display: block; }
+    #html-source {
+      display: block;
+      padding: 20px 22px;
+      font-family: var(--ed-mono); font-size: 12.5px;
+      line-height: 1.75; color: var(--ed-text);
+      white-space: pre; 
+    }
+    
+    .wrap-active #html-source, .wrap-active #html-css-source {
+      white-space: pre-wrap !important;
+      word-break: break-all !important;
+    }
+    .wrap-active .md-preview {
+      word-break: break-all;
+    }
+    .wrap-active .md-preview pre {
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+
+    /* ── Preview typography ── */
+    .md-preview { max-width: 100%; }
+    .md-preview [data-line] { border-radius: 3px; transition: background .15s; }
+    .md-preview [data-line].hovered { background: rgba(26,107,58,.08); }
+    [data-theme="dark"] .md-preview [data-line].hovered { background: rgba(61,186,110,.1); }
+
+    .md-preview h1,.md-preview h2,.md-preview h3,
+    .md-preview h4,.md-preview h5,.md-preview h6 {
+      font-family: var(--ed-sans); font-weight: 600; line-height: 1.3;
+      color: var(--ed-text); margin-top: 1.5em; margin-bottom: .45em;
+    }
+    .md-preview h1 { font-size: 1.85em; border-bottom: 2px solid var(--ed-border); padding-bottom: .3em; margin-top: .5em; }
+    .md-preview h2 { font-size: 1.4em;  border-bottom: 1px solid var(--ed-border); padding-bottom: .2em; }
+    .md-preview h3 { font-size: 1.15em; }
+    .md-preview p  { margin-bottom: .85em; line-height: 1.75; color: var(--ed-text); }
+    .md-preview a  { color: var(--ed-accent); text-decoration: underline; text-underline-offset: 2px; }
+    .md-preview strong { font-weight: 600; }
+    .md-preview em { color: var(--ed-text2); }
+    .md-preview del { color: var(--ed-text3); }
+    .md-preview hr { border: none; border-top: 1px solid var(--ed-border2); margin: 1.6em 0; }
+    .md-preview blockquote {
+      border-left: 3px solid var(--ed-accent); margin: 1em 0;
+      padding: 9px 15px; background: var(--ed-accent-s);
+      border-radius: 0 var(--ed-radius) var(--ed-radius) 0;
+      color: var(--ed-text2); font-style: italic;
+    }
+    .md-preview ul,.md-preview ol { padding-left: 1.4em; margin-bottom: .85em; }
+    .md-preview li { margin-bottom: .25em; line-height: 1.65; }
+    .md-preview code {
+      font-family: var(--ed-mono); font-size: .87em;
+      background: var(--ed-surface2); border: 1px solid var(--ed-border);
+      border-radius: 4px; padding: .13em .38em; color: var(--ed-accent);
+    }
+    .md-preview pre {
+      background: var(--ed-surface2); border: 1px solid var(--ed-border);
+      border-radius: 8px; padding: 15px 18px;
+      overflow-x: auto; margin-bottom: .9em;
+    }
+    .md-preview pre code { background: none; border: none; padding: 0; font-size: .84em; color: var(--ed-text); line-height: 1.65; }
+    .md-preview table { width: 100%; border-collapse: collapse; margin-bottom: .9em; font-size: .9em; }
+    .md-preview th { background: var(--ed-surface2); border: 1px solid var(--ed-border); padding: 7px 11px; font-weight: 600; text-align: left; }
+    .md-preview td { border: 1px solid var(--ed-border); padding: 6px 11px; }
+    .md-preview tr:nth-child(even) td { background: var(--ed-surface2); }
+    .md-preview img { max-width: 100%; border-radius: var(--ed-radius); }
+    .md-preview input[type=checkbox] { margin-right: 5px; accent-color: var(--ed-accent); }
+
+    /* ── Math ── */
+    .md-preview .math-block { display: block; overflow-x: auto; margin: 1.2em 0; padding: 10px 0; text-align: center; }
+    .md-preview .math-inline { display: inline; }
+    .md-preview .katex-display { margin: 0; }
+
+    /* ── Status bar ── */
+    .status-bar {
+      height: var(--ed-status-h);
+      background: var(--ed-surface2); border-top: 1px solid var(--ed-border);
+      display: flex; align-items: center;
+      padding: 0 12px; gap: 14px;
+      font-size: 10.5px; color: var(--ed-text3); flex-shrink: 0;
+    }
+    .sdot { width: 5px; height: 5px; border-radius: 50%; background: var(--ed-accent); display:inline-block; margin-right:4px; }
+
+    /* ── Custom CSS panel ── */
+    .css-panel {
+      display: none; flex-direction: column;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 500;
+      background: var(--ed-surface);
+      border-top: 2px solid var(--ed-accent);
+      box-shadow: 0 -4px 24px rgba(0,0,0,.13);
+      height: 280px;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+    .css-panel.open { display: flex; }
+    .css-panel-hdr {
+      height: 36px; display: flex; align-items: center;
+      padding: 0 14px; gap: 8px;
+      border-bottom: 1px solid var(--ed-border);
+      background: var(--ed-surface2);
+      font-size: 11px; font-weight: 600; color: var(--ed-text2);
+      flex-shrink: 0;
+    }
+    .css-panel-hdr span { flex: 1; }
+    .css-panel-hdr-hint {
+      font-size: 10px; font-weight: 400; color: var(--ed-text3);
+    }
+    .css-x { background: none; border: none; cursor: pointer; color: var(--ed-text3); font-size: 14px; padding: 2px 5px; border-radius: 3px; line-height:1; }
+    .css-x:hover { color: var(--ed-text); background: var(--ed-border); }
+    #custom-css {
+      flex: 1; padding: 10px 14px; border: none; outline: none; resize: none;
+      background: var(--ed-surface); color: var(--ed-text);
+      font-family: var(--ed-mono); font-size: 12px; line-height: 1.65;
+      overflow-y: auto;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 22px; left: 50%;
+      transform: translateX(-50%) translateY(14px);
+      background: var(--ed-text); color: var(--ed-surface);
+      padding: 7px 15px; border-radius: 18px;
+      font-size: 12px; font-weight: 500;
+      opacity: 0; pointer-events: none;
+      transition: opacity .18s, transform .18s; z-index: 9999;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 680px) {
+      .editor-layout { 
+        flex-direction: column; 
+      }
+      .pane + .pane { 
+        border-left: none; 
+        border-top: 1px solid var(--ed-border); 
+      }
+      .pane { 
+        flex: 1 1 50%; 
+        min-height: 0; 
+      }
+      .pane-body { 
+        min-height: 0; 
+        flex: 1;
+      }
+      .preview-scroll { 
+        min-height: 0; 
+        flex: 1;
+      }
+      
+      /* Subbar fix - buttons wrap */
+      .editor-subbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      
+      .subbar-right {
+        margin-left: 0;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      
+      .sub-btn {
+        font-size: 11px;
+        padding: 0 8px;
+        height: 30px;
+      }
+      
+      .sub-btn svg {
+        width: 11px;
+        height: 11px;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .editor-subbar {
+        padding: 6px 10px;
+      }
+      
+      .sub-btn {
+        font-size: 10px;
+        padding: 0 6px;
+        height: 28px;
+      }
+      
+      .sub-btn svg {
+        width: 10px;
+        height: 10px;
+      }
+      
+      .editor-subbar-title {
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .editor-subbar { 
+        padding: 6px 8px; 
+        gap: 6px;
+      }
+      .editor-subbar-title { 
+        font-size: 10px; 
+      }
+      .sub-btn { 
+        font-size: 9px; 
+        padding: 0 5px;
+        height: 26px;
+      }
+      .sub-btn svg {
+        width: 9px;
+        height: 9px;
+      }
+      .pane-toolbar { 
+        padding: 0 4px; 
+      }
+      .tbtn { 
+        font-size: 10px; 
+        padding: 0 4px; 
+      }
+      #md-input { 
+        padding: 12px 14px; 
+        font-size: 12.5px; 
+      }
+      .preview-scroll { 
+        padding: 16px 18px; 
+      }
+    }
+
+    /* ── Line numbers gutter ── */
+    .editor-with-gutter {
+      display: flex; flex: 1 1 auto; min-height: 0; overflow: hidden;
+      position: relative;
+    }
+
+    .editor-gutter {
+      position: relative;
+      width: 40px;
+      flex-shrink: 0;
+      background: var(--ed-surface2);
+      border-right: 1px solid var(--ed-border);
+      overflow: hidden;
+      user-select: none;
+      pointer-events: none;
+      z-index: 2;
+      box-sizing: border-box;
+    }
+
+    /* Canvas fills the gutter — drawn by JS */
+    #ed-gutter-canvas {
+      display: block;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--ed-surface2);
+    }
+
+    /* Textarea gets left padding to make room for the gutter */
+    #md-input {
+      flex: 1 1 auto; min-height: 0;
+    }
+
+    /* ── Multi-cursor overlay ── */
+    #mc-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none; overflow: hidden;
+    }
+    .mc-cursor {
+      position: absolute; width: 2px;
+      background: var(--ed-accent);
+      animation: mc-blink 1.1s step-end infinite;
+      border-radius: 1px; z-index: 10;
+    }
+    .mc-selection {
+      position: absolute;
+      background: rgba(26,107,58,0.18);
+      border-radius: 2px; z-index: 9;
+    }
+    [data-theme="dark"] .mc-selection { background: rgba(61,186,110,0.18); }
+    @keyframes mc-blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── Find / Replace panel ── */
+    #find-panel {
+      display: none; position: fixed; top: 70px; right: 16px; z-index: 1000;
+      background: var(--ed-surface);
+      border: 1px solid var(--ed-border2);
+      border-radius: 8px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+      padding: 8px 10px; min-width: 300px;
+      font-family: var(--ed-sans); font-size: 12px;
+    }
+    #find-panel.open { display: block; }
+    .fp-row { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .fp-row:last-child { margin-bottom: 0; }
+    .fp-input {
+      flex: 1; height: 26px; padding: 0 8px;
+      border: 1px solid var(--ed-border2); border-radius: 5px;
+      background: var(--ed-surface2); color: var(--ed-text);
+      font-family: var(--ed-mono); font-size: 12px; outline: none;
+    }
+    .fp-input:focus { border-color: var(--ed-accent); }
+    .fp-btn {
+      height: 26px; padding: 0 8px; border-radius: 5px;
+      border: 1px solid var(--ed-border2);
+      background: var(--ed-surface2); color: var(--ed-text2);
+      font-size: 11px; cursor: pointer; white-space: nowrap;
+      font-family: var(--ed-sans);
+    }
+    .fp-btn:hover { background: var(--ed-border); color: var(--ed-text); }
+    .fp-btn.primary { background: var(--ed-accent); color: #fff; border-color: var(--ed-accent); }
+    .fp-btn.primary:hover { background: var(--ed-accent2); }
+    .fp-count { font-size: 11px; color: var(--ed-text3); min-width: 50px; text-align: center; }
+    .fp-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--ed-text3); font-size: 14px; padding: 0 3px; line-height: 1;
+      border-radius: 3px;
+    }
+    .fp-close:hover { color: var(--ed-text); background: var(--ed-border); }
+    .fp-toggle { font-size: 10px; color: var(--ed-text3); cursor: pointer; padding: 2px 5px; border-radius: 3px; }
+    .fp-toggle:hover { background: var(--ed-border); color: var(--ed-text); }
+    .find-highlight { background: rgba(255,200,0,0.35); border-radius: 2px; }
+    .find-highlight.current { background: rgba(255,140,0,0.55); outline: 1px solid orange; }
+
+    /* ── Go-to-line popup ── */
+    #goto-panel {
+      display: none; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 300; background: var(--ed-surface);
+      border: 1px solid var(--ed-border2); border-radius: 8px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.18);
+      padding: 12px 14px; min-width: 220px;
+      font-family: var(--ed-sans); font-size: 12px;
+    }
+    #goto-panel.open { display: block; }
+    #goto-input {
+      width: 100%; height: 28px; padding: 0 8px; margin-top: 6px;
+      border: 1px solid var(--ed-border2); border-radius: 5px;
+      background: var(--ed-surface2); color: var(--ed-text);
+      font-family: var(--ed-mono); font-size: 13px; outline: none;
+    }
+    #goto-input:focus { border-color: var(--ed-accent); }
+
+    /* ── Word wrap toggle indicator ── */
+    #btn-wordwrap.active { background: var(--ed-accent-s); color: var(--ed-accent); }
+
+  </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <div id="navbar-container"></div>
+
+
+<!-- ════════════════════════════════════════
+     EDITOR SUBBAR
+═══════════════════════════════════════════ -->
+<div class="editor-subbar">
+  <span class="editor-subbar-title">Sophmark</span>
+  <div class="subbar-sep"></div>
+  <span style="font-size:11px;color:var(--ed-text3);">powered by sophmark.js</span>
+  <div class="subbar-right">
+    <button class="sub-btn" id="btn-layout-toggle" title="Toggle Layout">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+      Layout
+    </button>
+    <div class="subbar-sep"></div>
+    <button class="sub-btn" id="btn-dl-md">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download .md
+    </button>
+    <button class="sub-btn" id="btn-dl-html-raw">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download .html
+    </button>
+    <button class="sub-btn" id="btn-dl-html">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download .html+css
+    </button>
+  </div>
+</div>
+<!-- ════════════════════════════════════════
+     EDITOR LAYOUT
+═══════════════════════════════════════════ -->
+<div class="editor-layout">
+
+  <!-- LEFT: Markdown pane -->
+  <div class="pane" id="left-pane">
+    <div class="pane-toolbar">
+      <span class="pane-label">Markdown</span>
+      <div class="tsep"></div>
+      <button class="tbtn" data-wrap="**" data-wrap-end="**" title="Bold">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+        Bold
+      </button>
+      <button class="tbtn" data-wrap="*" data-wrap-end="*" title="Italic">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+        Italic
+      </button>
+      <button class="tbtn" data-wrap="`" data-wrap-end="`" title="Inline code">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Code
+      </button>
+      <button class="tbtn" data-prefix="# " title="Heading 1">H1</button>
+      <button class="tbtn" data-prefix="## " title="Heading 2">H2</button>
+      <button class="tbtn" data-prefix="- " title="List item">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
+        List
+      </button>
+      <button class="tbtn" data-prefix="> " title="Blockquote">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>
+        Quote
+      </button>
+      <button class="tbtn" data-prefix="---" title="Horizontal rule">HR</button>
+      <div class="tright">
+        <button class="tbtn" id="btn-wordwrap" title="Toggle Word Wrap (Alt+Z)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 10 21 10"/><path d="M3 10h11a4 4 0 0 1 0 8h-1"/><polyline points="9 14 5 18 9 22"/></svg>
+          Wrap
+        </button>
+        <button class="tbtn" id="btn-find" title="Find (Ctrl+F)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Find
+        </button>
+        <button class="tbtn" id="btn-clear">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <div class="pane-body" id="editor-body">
+      <!-- Find/Replace panel -->
+      <div id="find-panel">
+        <div class="fp-row">
+          <input class="fp-input" id="fp-find" placeholder="Find…" autocomplete="off" spellcheck="false">
+          <span class="fp-count" id="fp-count"></span>
+          <button class="fp-btn" id="fp-prev" title="Previous (Shift+F3)">↑</button>
+          <button class="fp-btn" id="fp-next" title="Next (F3)">↓</button>
+          <button class="fp-btn" id="fp-all" title="Select All Occurrences">All</button>
+          <button class="fp-close" id="fp-close">✕</button>
+        </div>
+        <div class="fp-row" id="fp-replace-row" style="display:none">
+          <input class="fp-input" id="fp-replace" placeholder="Replace…" autocomplete="off" spellcheck="false">
+          <button class="fp-btn" id="fp-replace-one">Replace</button>
+          <button class="fp-btn primary" id="fp-replace-all">All</button>
+        </div>
+        <div class="fp-row">
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--ed-text3);font-size:11px">
+            <input type="checkbox" id="fp-case"> Case
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--ed-text3);font-size:11px;margin-left:8px">
+            <input type="checkbox" id="fp-regex"> Regex
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--ed-text3);font-size:11px;margin-left:8px">
+            <input type="checkbox" id="fp-word"> Word
+          </label>
+          <span class="fp-toggle" id="fp-toggle-replace" style="margin-left:auto">± Replace</span>
+        </div>
+      </div>
+      <!-- Go to line panel -->
+      <div id="goto-panel">
+        <div style="color:var(--ed-text2);font-weight:600">Go to Line</div>
+        <input id="goto-input" type="number" min="1" placeholder="Line number…">
+      </div>
+      <div class="editor-with-gutter">
+        <div class="editor-gutter" id="ed-gutter">
+          <canvas id="ed-gutter-canvas"></canvas>
+        </div>
+        <div style="position:relative;flex:1;display:flex;flex-direction:column;">
+          <div class="editor-highlight-line" id="hl-line"></div>
+          <div id="mc-overlay"></div>
+          <textarea id="md-input" spellcheck="false" placeholder="Start writing Markdown…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom CSS panel (fixed bottom) -->
+    <div class="css-panel" id="css-panel">
+      <div class="css-panel-hdr">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <span>Custom Preview CSS</span>
+        <span class="css-panel-hdr-hint">Edit to override preview styles — changes apply live</span>
+        <button class="css-x" id="css-close" title="Close (Esc)">✕</button>
+      </div>
+      <textarea id="custom-css" spellcheck="false"></textarea>
+    </div>
+
+    <div class="status-bar">
+      <span><span class="sdot"></span><span id="stat-words">0 words</span></span>
+      <span id="stat-chars">0 chars</span>
+      <span id="stat-lines">0 lines</span>
+    </div>
+  </div>
+
+  <!-- RIGHT: Preview pane -->
+  <div class="pane" id="right-pane">
+    <div class="pane-toolbar">
+      <span class="pane-label">Preview</span>
+      <div class="tsep"></div>
+      <button class="tbtn active" id="btn-preview-tab">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Preview
+      </button>
+      <button class="tbtn" id="btn-source-tab">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Raw HTML
+      </button>
+      <button class="tbtn" id="btn-htmlcss-tab">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        HTML+CSS
+      </button>
+      <!-- <div class="tright">
+        <button class="tbtn" id="btn-custom-css" title="Custom CSS for preview">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          CSS
+        </button>       
+        <div class="tsep"></div>
+        <button class="tbtn" id="btn-copy-html">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy HTML+CSS
+        </button> -->
+      <div class="tright">
+        <button class="tbtn" id="btn-preview-wrap" title="Toggle Wrap in Preview">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 10 21 10"/><path d="M3 10h11a4 4 0 0 1 0 8h-1"/><polyline points="9 14 5 18 9 22"/></svg>
+          Wrap
+        </button>
+        <div class="tsep"></div>
+        <button class="tbtn" id="btn-custom-css" title="Custom CSS for preview">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          CSS
+        </button>       
+        <div class="tsep"></div>
+        <button class="tbtn" id="btn-copy-html-raw">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy HTML
+        </button>
+        <button class="tbtn" id="btn-copy-html">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy HTML+CSS
+        </button>
+      </div>
+    </div>
+
+    <div class="preview-scroll" id="preview-scroll">
+      <div class="md-preview" id="preview"></div>
+    </div>
+    <div id="html-source-wrap"><code id="html-source"></code></div>
+    <style id="user-css-tag"></style>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Floating Horizontal Scrollbar -->
+<div id="floating-h-scroll" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:60%; max-width:600px; height:40px; background:var(--ed-surface2); border:1px solid var(--ed-border); border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.3); z-index:9999; align-items:center; padding:0 15px; gap:10px;">
+  <div id="fh-track" style="flex:1; height:6px; background:var(--ed-border); border-radius:3px; position:relative; cursor:pointer;">
+    <div id="fh-thumb" style="position:absolute; height:100%; width:50px; background:var(--ed-accent); border-radius:3px; left:0; transition: background 0.1s;"></div>
+  </div>
+  <button id="fh-cancel" style="background:none; border:none; color:var(--ed-text2); cursor:pointer; padding:5px; font-size:16px;">✕</button>
+</div>
+
+<!-- sophmark.js -->
+<!-- <script src="js/sophmark.js"></script> -->
+
+<script>
+// ── Elements ────────────────────────────────
+const mdInput        = document.getElementById('md-input');
+const preview        = document.getElementById('preview');
+const htmlSource     = document.getElementById('html-source');
+const previewScroll  = document.getElementById('preview-scroll');
+const htmlSourceWrap = document.getElementById('html-source-wrap');
+const statWords      = document.getElementById('stat-words');
+const statChars      = document.getElementById('stat-chars');
+const statLines      = document.getElementById('stat-lines');
+const toastEl        = document.getElementById('toast');
+const userCssTag     = document.getElementById('user-css-tag');
+const cssPanel       = document.getElementById('css-panel');
+const customCss      = document.getElementById('custom-css');
+const hlLine         = document.getElementById('hl-line');
+const editorBody     = document.getElementById('editor-body');
+const htmlCssWrap    = document.getElementById('html-css-wrap');
+
+// ── Sophmark custom renderer with line tracking ──
+function buildLineTrackedRenderer() {
+  const renderer = new sophmark.Renderer();
+  const lineMap = [];   // lineMap[i] = md line number (0-based) for rendered block i
+  let blockIndex = 0;
+
+  // We approximate line numbers by scanning the markdown
+  // Each top-level block gets a data-line attr with its approx start line
+  const orig = {};
+  ['heading','paragraph','blockquote','list','code','hr','table','html'].forEach(type => {
+    orig[type] = renderer[type].bind(renderer);
+    renderer[type] = function(token) {
+      const result = orig[type](token);
+      const lineNum = token._lineNum !== undefined ? token._lineNum : 0;
+      // wrap in span with data-line
+      return result.replace(/^(<\w[^>]*>)/, (m, tag) => {
+        // inject data-line into first opening tag
+        return tag.slice(0, -1) + ' data-line="' + lineNum + '">';
+      });
+    };
+  });
+  return renderer;
+}
+
+// ── Line number injection via walkTokens ────
+function addLineNumbers(md) {
+  const lines = md.split('\n');
+  const tokens = sophmark.lexer(md);
+  // We'll do a simple scan: map each token's raw text back to a line number
+  let remaining = md;
+  let lineNum = 0;
+  function tagTokens(tokenList) {
+    tokenList.forEach(token => {
+      if (!token.raw) return;
+      const idx = remaining.indexOf(token.raw);
+      if (idx !== -1) {
+        // count newlines before this token
+        const before = remaining.slice(0, idx);
+        lineNum += (before.match(/\n/g) || []).length;
+        token._lineNum = lineNum;
+        remaining = remaining.slice(idx + token.raw.length);
+      }
+      if (token.tokens) tagTokens(token.tokens);
+      if (token.items) tagTokens(token.items);
+    });
+  }
+  tagTokens(tokens);
+  return tokens;
+}
+
+// ── Render ──────────────────────────────────
+
+// ── Precise preview→source line mapping ─────────────────────────────────────
+//
+// Strategy: content-fingerprint matching.
+// For each rendered top-level element, extract a "fingerprint" from its
+// content (text, alt text, href, etc.), then search the raw markdown for
+// the line that best matches that fingerprint. This is immune to block-count
+// mismatches between the scanner and the renderer.
+
+function injectDataLines(html, md) {
+  const mdLines = md.split('\n');
+  // Performance: for large documents skip per-element fingerprint search
+  // and use the fast block-line scanner only
+  const useFastPath = mdLines.length > FAST_INJECT_THRESHOLD;
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<div id="root">${html}</div>`, 'text/html');
+  const root = doc.getElementById('root');
+  if (!root) return html;
+
+  const children = Array.from(root.children);
+  if (!children.length) return html;
+
+  if (useFastPath) {
+    const blockLines = getMarkdownBlockLines(md);
+    children.forEach((el, i) => {
+      el.setAttribute('data-line', blockLines[i] !== undefined ? blockLines[i] : 0);
+    });
+  } else {
+    children.forEach(el => {
+      const lineNum = findSourceLine(el, mdLines);
+      el.setAttribute('data-line', lineNum);
+    });
+  }
+
+  return root.innerHTML;
+}
+
+// Extract a search fingerprint from a rendered element.
+// Returns { type, text } where text is what to look for in the markdown.
+function getElementFingerprint(el) {
+  const tag = el.tagName.toLowerCase();
+
+  // Heading — look for the ATX prefix + text
+  if (/^h[1-6]$/.test(tag)) {
+    return { type: 'heading', level: parseInt(tag[1]), text: el.textContent.trim() };
+  }
+
+  // Fenced code block
+  if (tag === 'pre') {
+    const code = el.querySelector('code');
+    const firstLine = (code ? code.textContent : el.textContent).split('\n')[0].trim();
+    return { type: 'code', text: firstLine };
+  }
+
+  // Blockquote — first non-empty text line
+  if (tag === 'blockquote') {
+    const text = el.textContent.trim().split('\n')[0].trim();
+    return { type: 'blockquote', text };
+  }
+
+  // Horizontal rule
+  if (tag === 'hr') {
+    return { type: 'hr', text: '' };
+  }
+
+  // Table — first header cell text
+  if (tag === 'table') {
+    const th = el.querySelector('th');
+    return { type: 'table', text: th ? th.textContent.trim() : '' };
+  }
+
+  // List (ul/ol) — text of first list item
+  if (tag === 'ul' || tag === 'ol') {
+    const li = el.querySelector('li');
+    // task list item
+    const cb = li ? li.querySelector('input[type=checkbox]') : null;
+    const liText = li ? li.textContent.trim().replace(/^\s*/, '') : '';
+    return { type: 'list', ordered: tag === 'ol', text: liText, hasCheckbox: !!cb };
+  }
+
+  // Image (paragraph containing only an img)
+  const imgs = el.querySelectorAll('img');
+  if (imgs.length === 1 && el.textContent.trim() === '') {
+    return { type: 'image', alt: imgs[0].getAttribute('alt') || '', src: imgs[0].getAttribute('src') || '' };
+  }
+  if (tag === 'p' && imgs.length >= 1) {
+    // paragraph that starts with an image
+    const img = imgs[0];
+    return { type: 'image', alt: img.getAttribute('alt') || '', src: img.getAttribute('src') || '' };
+  }
+
+  // Math block (KaTeX wraps in .katex-display or has class math-block)
+  if (el.classList.contains('math-block') || el.querySelector('.katex-display')) {
+    return { type: 'math', text: el.textContent.trim().slice(0, 30) };
+  }
+
+  // Paragraph — use first ~60 chars of plain text
+  if (tag === 'p') {
+    return { type: 'paragraph', text: el.textContent.trim().slice(0, 80) };
+  }
+
+  // Fallback
+  return { type: 'other', text: el.textContent.trim().slice(0, 60) };
+}
+
+// Given a fingerprint and the markdown lines array, return the best 0-based line index.
+function findSourceLine(el, mdLines) {
+  const fp = getElementFingerprint(el);
+
+  switch (fp.type) {
+
+    case 'heading': {
+      const prefix = '#'.repeat(fp.level);
+      // Exact match first
+      for (let i = 0; i < mdLines.length; i++) {
+        const t = mdLines[i].trim();
+        if (t.startsWith(prefix + ' ') || t.startsWith(prefix + '\t')) {
+          const headingText = t.replace(/^#+\s*/, '').replace(/\s+#+\s*$/, '').trim();
+          if (headingText === fp.text) return i;
+        }
+      }
+      // Fuzzy: heading text contains fp.text
+      for (let i = 0; i < mdLines.length; i++) {
+        const t = mdLines[i].trim();
+        if (t.startsWith(prefix)) {
+          const headingText = t.replace(/^#+\s*/, '').trim();
+          if (headingText.toLowerCase().includes(fp.text.toLowerCase().slice(0, 20))) return i;
+        }
+      }
+      // Setext heading
+      for (let i = 1; i < mdLines.length; i++) {
+        if (/^(=+|-+)\s*$/.test(mdLines[i].trim())) {
+          if (mdLines[i - 1].trim().toLowerCase().includes(fp.text.toLowerCase().slice(0, 20))) return i - 1;
+        }
+      }
+      break;
+    }
+
+    case 'code': {
+      // Find the opening fence line
+      for (let i = 0; i < mdLines.length; i++) {
+        if (/^(`{3,}|~{3,})/.test(mdLines[i].trim())) {
+          // If we have a first-line fingerprint, check the next line
+          if (fp.text && i + 1 < mdLines.length) {
+            if (mdLines[i + 1].trim().startsWith(fp.text.slice(0, 15))) return i;
+          } else {
+            return i;
+          }
+        }
+      }
+      // Indented code block (4 spaces)
+      for (let i = 0; i < mdLines.length; i++) {
+        if (mdLines[i].startsWith('    ') && mdLines[i].trim().startsWith(fp.text.slice(0, 10))) return i;
+      }
+      break;
+    }
+
+    case 'blockquote': {
+      const needle = fp.text.replace(/^>\s*/, '').slice(0, 30).toLowerCase();
+      for (let i = 0; i < mdLines.length; i++) {
+        if (/^>/.test(mdLines[i].trim())) {
+          const bqText = mdLines[i].replace(/^>\s*/, '').trim().toLowerCase();
+          if (needle && bqText.includes(needle.slice(0, 20))) return i;
+          if (!needle) return i;
+        }
+      }
+      break;
+    }
+
+    case 'hr': {
+      for (let i = 0; i < mdLines.length; i++) {
+        if (/^([-*_])(\s*\1){2,}\s*$/.test(mdLines[i].trim())) return i;
+      }
+      break;
+    }
+
+    case 'table': {
+      // Table lines contain |
+      for (let i = 0; i < mdLines.length; i++) {
+        if (/\|/.test(mdLines[i])) {
+          // Check if the first header cell matches
+          const cells = mdLines[i].split('|').map(c => c.trim()).filter(Boolean);
+          if (cells.length && fp.text && cells[0].toLowerCase().includes(fp.text.toLowerCase().slice(0, 15))) return i;
+          if (!fp.text) return i;
+        }
+      }
+      break;
+    }
+
+    case 'list': {
+      const firstItemText = fp.text.replace(/^\[[ x]\]\s*/, '').slice(0, 40).toLowerCase();
+      const listPrefixRe = fp.ordered ? /^\d+[.)]\s/ : /^[-*+]\s/;
+      for (let i = 0; i < mdLines.length; i++) {
+        const t = mdLines[i].trim();
+        if (listPrefixRe.test(t)) {
+          const itemText = t.replace(/^(\d+[.)]\s|[-*+]\s)/, '').replace(/^\[[ x]\]\s*/, '').trim().toLowerCase();
+          if (firstItemText && itemText.includes(firstItemText.slice(0, 25))) return i;
+          if (!firstItemText) return i;
+        }
+      }
+      break;
+    }
+
+    case 'image': {
+      // Look for ![alt](src) or ![alt][ref]
+      const altNeedle  = fp.alt.slice(0, 30).toLowerCase();
+      const srcNeedle  = fp.src.split('/').pop().split('?')[0].toLowerCase(); // filename
+      for (let i = 0; i < mdLines.length; i++) {
+        const t = mdLines[i];
+        if (t.includes('![')) {
+          if (altNeedle && t.toLowerCase().includes(altNeedle)) return i;
+          if (srcNeedle && t.toLowerCase().includes(srcNeedle)) return i;
+        }
+      }
+      break;
+    }
+
+    case 'math': {
+      // Look for $$ or \[ math delimiters
+      for (let i = 0; i < mdLines.length; i++) {
+        const t = mdLines[i].trim();
+        if (t.startsWith('$$') || t.startsWith('\\[')) return i;
+      }
+      break;
+    }
+
+    case 'paragraph':
+    default: {
+      // Use the first meaningful words of the paragraph text to find the source line.
+      // Strip markdown syntax from the needle for a clean text search.
+      const rawText = fp.text;
+      if (!rawText) break;
+
+      // Build a search needle: first 35 chars, lowercased, stripped of common md syntax
+      const needle = rawText
+        .replace(/[*_`~\[\]()#>]/g, '')  // strip md chars
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase()
+        .slice(0, 35);
+
+      if (!needle) break;
+
+      let bestLine = -1;
+      let bestScore = 0;
+
+      for (let i = 0; i < mdLines.length; i++) {
+        const lineText = mdLines[i]
+          .replace(/[*_`~\[\]()#>]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .toLowerCase();
+
+        if (!lineText) continue;
+
+        // Exact substring match — highest confidence
+        if (lineText.includes(needle)) {
+          return i;
+        }
+
+        // Partial match: count how many words of needle appear in lineText
+        const needleWords = needle.split(' ').filter(w => w.length > 3);
+        if (needleWords.length) {
+          const matches = needleWords.filter(w => lineText.includes(w)).length;
+          const score = matches / needleWords.length;
+          if (score > bestScore) { bestScore = score; bestLine = i; }
+        }
+      }
+
+      if (bestScore >= 0.5 && bestLine !== -1) return bestLine;
+      break;
+    }
+  }
+
+  // Last resort: fall back to sequential block-line mapping
+  return fallbackBlockLine(el, mdLines);
+}
+
+// Fallback: find which sequential block index this element is among its siblings,
+// then return the corresponding block line from the scanner.
+function fallbackBlockLine(el, mdLines) {
+  const siblings = el.parentElement ? Array.from(el.parentElement.children) : [];
+  const idx = siblings.indexOf(el);
+  const blockLines = getMarkdownBlockLines(mdLines.join('\n'));
+  return blockLines[idx] !== undefined ? blockLines[idx] : 0;
+}
+
+// Returns an array of 0-based line indices, one per top-level markdown block.
+function getMarkdownBlockLines(md) {
+  const lines = md.split('\n');
+  const blockLines = [];
+  let i = 0;
+  let inFence = false;
+  let fenceChar = '';
+
+  while (i < lines.length) {
+    const raw     = lines[i];
+    const trimmed = raw.trim();
+
+    if (inFence) {
+      const closeMatch = raw.match(/^(\s*)(`{3,}|~{3,})\s*$/);
+      if (closeMatch && closeMatch[2][0] === fenceChar && closeMatch[2].length >= 3) inFence = false;
+      i++; continue;
+    }
+
+    if (trimmed === '') { i++; continue; }
+
+    const fenceMatch = raw.match(/^(\s*)(`{3,}|~{3,})/);
+    if (fenceMatch) {
+      blockLines.push(i); inFence = true; fenceChar = fenceMatch[2][0]; i++; continue;
+    }
+    if (/^#{1,6}(\s|$)/.test(trimmed)) { blockLines.push(i); i++; continue; }
+    if (/^(=+|-+)\s*$/.test(trimmed) && blockLines.length > 0) { i++; continue; }
+    if (/^([-*_])(\s*\1){2,}\s*$/.test(trimmed)) { blockLines.push(i); i++; continue; }
+
+    if (/^>/.test(trimmed)) {
+      blockLines.push(i); i++;
+      while (i < lines.length && lines[i].trim() !== '') i++;
+      continue;
+    }
+    if (/^[-*+]\s/.test(trimmed)) {
+      blockLines.push(i); i++;
+      while (i < lines.length) {
+        const t = lines[i].trim();
+        if (t === '') { if (i+1 < lines.length && /^([-*+]\s|\s{2,})/.test(lines[i+1])) { i++; continue; } break; }
+        if (/^[-*+]\s/.test(t) || /^\s{2,}/.test(lines[i])) { i++; continue; }
+        break;
+      }
+      continue;
+    }
+    if (/^\d+[.)]\s/.test(trimmed)) {
+      blockLines.push(i); i++;
+      while (i < lines.length) {
+        const t = lines[i].trim();
+        if (t === '') { if (i+1 < lines.length && /^(\d+[.)]\s|\s{2,})/.test(lines[i+1])) { i++; continue; } break; }
+        if (/^\d+[.)]\s/.test(t) || /^\s{2,}/.test(lines[i])) { i++; continue; }
+        break;
+      }
+      continue;
+    }
+    if (/^</.test(trimmed)) {
+      blockLines.push(i); i++;
+      while (i < lines.length && lines[i].trim() !== '') i++;
+      continue;
+    }
+    if (/\|/.test(trimmed)) {
+      blockLines.push(i); i++;
+      while (i < lines.length && /\|/.test(lines[i])) i++;
+      continue;
+    }
+
+    blockLines.push(i); i++;
+    while (i < lines.length) {
+      const t = lines[i].trim();
+      if (t === '') break;
+      if (/^(=+|-+)\s*$/.test(t)) { i++; break; }
+      if (/^#{1,6}(\s|$)/.test(t)) break;
+      if (/^([-*_])(\s*\1){2,}\s*$/.test(t)) break;
+      if (/^>/.test(t)) break;
+      if (/^[-*+]\s/.test(t)) break;
+      if (/^\d+[.)]\s/.test(t)) break;
+      if (/^(`{3,}|~{3,})/.test(t)) break;
+      i++;
+    }
+  }
+
+  return blockLines;
+}
+
+let renderTimer;
+const WORKER_URL = 'https://sophmark-api.arcosoph.workers.dev/';
+
+// ── Performance: RAF-gated gutter update ─────────────────────
+let _gutterRafPending = false;
+function scheduleGutter() {
+  if (_gutterRafPending) return;
+  _gutterRafPending = true;
+  requestAnimationFrame(() => { _gutterRafPending = false; updateGutter(); });
+}
+
+// ── Performance: throttled scroll handler ────────────────────
+function throttle(fn, ms) {
+  let last = 0, tid;
+  return function(...args) {
+    const now = Date.now();
+    const remaining = ms - (now - last);
+    if (remaining <= 0) { last = now; fn.apply(this, args); }
+    else { clearTimeout(tid); tid = setTimeout(() => { last = Date.now(); fn.apply(this, args); }, remaining); }
+  };
+}
+
+// ── Performance: fast canvas-based line-height measurement cache ──
+let _cachedLineHeight = 0;
+let _cachedFontSize   = 0;
+function getLineHeightFast() {
+  const fs = parseFloat(getComputedStyle(mdInput).fontSize);
+  if (fs !== _cachedFontSize) { _cachedFontSize = fs; _cachedLineHeight = fs * 1.8; }
+  return _cachedLineHeight;
+}
+
+// ── Performance: fast char-offset → visual Y (no DOM mirror) ─
+// Uses a canvas to measure text widths per line, then accumulates
+// visual rows. Accurate for monospace fonts without wrap, and
+// gives a good approximation with wrap.
+let _fmCanvas, _fmCtx, _fmFont = '';
+function getFMCtx() {
+  if (!_fmCanvas) { _fmCanvas = document.createElement('canvas'); _fmCtx = _fmCanvas.getContext('2d'); }
+  const cs = getComputedStyle(mdInput);
+  const font = cs.fontSize + ' ' + cs.fontFamily;
+  if (font !== _fmFont) { _fmFont = font; _fmCtx.font = font; }
+  return _fmCtx;
+}
+
+// Returns the pixel Y (relative to textarea top, scroll-adjusted) for a given logical line index.
+// Fast path: no wrap → pure math. Wrap path: canvas measurement per line.
+function lineIndexToY(lineIdx, lines) {
+  const lh = getLineHeightFast();
+  const pt = parseFloat(getComputedStyle(mdInput).paddingTop);
+  if (!wordWrapOn) {
+    return pt + lineIdx * lh - mdInput.scrollTop;
+  }
+  // Wrap: measure each line's visual row count using canvas
+  const ctx = getFMCtx();
+  const availW = mdInput.clientWidth
+    - parseFloat(getComputedStyle(mdInput).paddingLeft)
+    - parseFloat(getComputedStyle(mdInput).paddingRight);
+  let y = pt - mdInput.scrollTop;
+  for (let i = 0; i < lineIdx; i++) {
+    const lineW = ctx.measureText(lines[i]).width;
+    const rows  = Math.max(1, Math.ceil(lineW / availW));
+    y += rows * lh;
+  }
+  return y;
+}
+
+// ── Performance: large-doc threshold for skipping expensive fingerprint search ──
+const FAST_INJECT_THRESHOLD = 800; // lines — above this, use block-line fallback only
+
+// Render KaTeX math inside a container element.
+// sophmark.js outputs \[...\] for block and \(...\) for inline math.
+function renderMath(container) {
+  if (typeof renderMathInElement === 'function') {
+    renderMathInElement(container, {
+      delimiters: [
+        { left: '\\[', right: '\\]', display: true  },
+        { left: '\\(', right: '\\)', display: false },
+      ],
+      throwOnError: false,
+    });
+  }
+}
+
+
+// function renderMath(container) {
+//   if (typeof renderMathInElement === 'function') {
+//     renderMathInElement(container, {
+//       delimiters: [
+//         { left: '\\[', right: '\\]', display: true  },
+//         { left: '\\(', right: '\\)', display: false },
+//       ],
+//       ignoredTags: [
+//         'script', 'noscript', 'style', 'textarea', 'pre', 'code'
+//       ],
+//       throwOnError: false,
+//     });
+//   }
+// }
+
+async function render() {
+  const md = mdInput.value;
+  updateStats(md);
+  
+  // Get HTML+CSS element (create if not exists)
+  let htmlCssSource = document.getElementById('html-css-source');
+  if (!htmlCssSource) {
+    const wrap = document.createElement('div');
+    wrap.id = 'html-css-wrap';
+    wrap.style.cssText = 'flex:1; overflow:auto; background:var(--ed-surface); min-height:0; display:none;';
+    wrap.innerHTML = '<code id="html-css-source" style="display:block; padding:20px 22px; font-family:var(--ed-mono); font-size:12.5px; line-height:1.75; color:var(--ed-text); white-space:pre;"></code>';
+    document.getElementById('right-pane').appendChild(wrap);
+    htmlCssSource = document.getElementById('html-css-source');
+  }
+  
+  if (!md.trim()) {
+    preview.innerHTML = '';
+    htmlSource.textContent = '';
+    if (htmlCssSource) htmlCssSource.textContent = '';
+    return;
+  }
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ markdown: md })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      preview.innerHTML = `<p style="color:red">Error: ${data.error}</p>`;
+      htmlSource.textContent = '';
+      if (htmlCssSource) htmlCssSource.textContent = '';
+      return;
+    }
+
+    // Preview tab — inject data-line attrs for hover-to-highlight
+    preview.innerHTML = injectDataLines(data.html, md);
+    renderMath(preview);
+    
+    // Raw HTML tab
+    htmlSource.textContent = data.html;
+    
+    // HTML+CSS tab
+    const fullHtmlWithCss = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ed-bg: #f7f7f5; --ed-surface: #ffffff; --ed-surface2: #f0efec;
+      --ed-border: #e2e0db; --ed-border2: #d0cdc6; --ed-text: #1a1916;
+      --ed-text2: #6b6860; --ed-text3: #9e9b94; --ed-accent: #1a6b3a;
+      --ed-accent-s: #e8f5ee; --ed-accent2: #0f4d28;
+      --ed-mono: 'DM Mono', monospace; --ed-sans: 'DM Sans', sans-serif;
+      --ed-radius: 6px;
+    }
+    body { font-family: var(--ed-sans); background: var(--ed-bg); color: var(--ed-text); margin: 0; }
+    .md-preview { max-width: 800px; margin: 0 auto; padding: 30px; }
+    .md-preview h1,.md-preview h2,.md-preview h3,.md-preview h4,.md-preview h5,.md-preview h6 {
+      font-family: var(--ed-sans); font-weight: 600; line-height: 1.3; color: var(--ed-text); margin-top: 1.5em; margin-bottom: .45em;
+    }
+    .md-preview h1 { font-size: 1.85em; border-bottom: 2px solid var(--ed-border); padding-bottom: .3em; margin-top: .5em; }
+    .md-preview h2 { font-size: 1.4em; border-bottom: 1px solid var(--ed-border); padding-bottom: .2em; }
+    .md-preview p { margin-bottom: .85em; line-height: 1.75; }
+    .md-preview a { color: var(--ed-accent); text-decoration: underline; }
+    .md-preview strong { font-weight: 600; }
+    .md-preview em { color: var(--ed-text2); }
+    .md-preview hr { border: none; border-top: 1px solid var(--ed-border2); margin: 1.6em 0; }
+    .md-preview blockquote {
+      border-left: 3px solid var(--ed-accent); margin: 1em 0; padding: 9px 15px;
+      background: var(--ed-accent-s); border-radius: 0 var(--ed-radius) var(--ed-radius) 0;
+      color: var(--ed-text2); font-style: italic;
+    }
+    .md-preview ul,.md-preview ol { padding-left: 1.4em; margin-bottom: .85em; }
+    .md-preview li { margin-bottom: .25em; line-height: 1.65; }
+    .md-preview code {
+      font-family: var(--ed-mono); font-size: .87em; background: var(--ed-surface2);
+      border: 1px solid var(--ed-border); border-radius: 4px; padding: .13em .38em;
+      color: var(--ed-accent);
+    }
+    .md-preview pre {
+      background: var(--ed-surface2); border: 1px solid var(--ed-border);
+      border-radius: 8px; padding: 15px 18px; overflow-x: auto; margin-bottom: .9em;
+    }
+    .md-preview pre code { background: none; border: none; padding: 0; font-size: .84em; color: var(--ed-text); }
+    .md-preview table { width: 100%; border-collapse: collapse; margin-bottom: .9em; font-size: .9em; }
+    .md-preview th { background: var(--ed-surface2); border: 1px solid var(--ed-border); padding: 7px 11px; font-weight: 600; text-align: left; }
+    .md-preview td { border: 1px solid var(--ed-border); padding: 6px 11px; }
+    .md-preview tr:nth-child(even) td { background: var(--ed-surface2); }
+    .md-preview img { max-width: 100%; border-radius: var(--ed-radius); }
+    .md-preview input[type=checkbox] { margin-right: 5px; accent-color: var(--ed-accent); }
+    .math-block { display: block; overflow-x: auto; margin: 1.2em 0; padding: 10px 0; text-align: center; }
+    .math-inline { display: inline; }
+    .katex-display { margin: 0; }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"><\/script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\\\[',right:'\\\\]',display:true},{left:'\\\\(',right:'\\\\)',display:false}],throwOnError:false})"><\/script>
+  <title>Sophmark Document</title>
+<\/head>
+<body>
+  <div class="md-preview">${data.html}</div>
+<\/body>
+<\/html>`;
+    
+    if (htmlCssSource) htmlCssSource.textContent = fullHtmlWithCss;
+
+    setTimeout(alignLayoutHeight, 10);
+
+  } catch (err) {
+    preview.innerHTML = '<p style="color:red">Connection failed</p>';
+    htmlSource.textContent = '';
+    if (htmlCssSource) htmlCssSource.textContent = '';
+  }
+}
+
+function updateStats(md) {
+  const w = md.trim() === '' ? 0 : md.trim().split(/\s+/).length;
+  statWords.textContent = w + ' word' + (w !== 1 ? 's' : '');
+  statChars.textContent = md.length + ' chars';
+  statLines.textContent = (md === '' ? 0 : md.split('\n').length) + ' lines';
+}
+
+
+preview.addEventListener('mouseover', e => {
+  const el = e.target.closest('[data-line]');
+  if (!el) return;
+  // remove previous highlights
+  document.querySelectorAll('.md-preview [data-line].hovered')
+    .forEach(x => x.classList.remove('hovered'));
+  el.classList.add('hovered');
+  const lineNum = parseInt(el.getAttribute('data-line'), 10);
+  if (!isNaN(lineNum)) {
+    highlightEditorLine._lastLine = lineNum;
+    highlightEditorLine(lineNum);
+  }
+});
+
+preview.addEventListener('mouseleave', () => {
+  document.querySelectorAll('.md-preview [data-line].hovered')
+    .forEach(x => x.classList.remove('hovered'));
+  hlLine.style.opacity = '0';
+  highlightEditorLine._lastLine = null;
+});
+
+// Re-position highlight bar when editor scrolls while hovering
+mdInput.addEventListener('scroll', throttle(() => {
+  if (highlightEditorLine._lastLine != null)
+    highlightEditorLine(highlightEditorLine._lastLine);
+}, 16));
+
+// ── Line height measurement ───────────────────────────────────
+// Chrome returns "normal" for textarea computedStyle.lineHeight even when
+// line-height is set explicitly as a ratio. We know the CSS value is 1.8,
+// so compute it directly: fontSize * 1.8. This is the single source of truth.
+function getLineHeight() {
+  return getLineHeightFast();
+}
+
+// ── Layout Height Syncing (Preview dictates height) ─────────────
+function alignLayoutHeight() {
+   const edLayout = document.querySelector('.editor-layout');
+   const previewScroll = document.getElementById('preview-scroll');
+   const htmlCssWrap = document.getElementById('html-css-wrap');
+   const htmlSourceWrap = document.getElementById('html-source-wrap');
+   
+   let activeContent = previewScroll;
+   if (htmlSourceWrap && htmlSourceWrap.classList.contains('visible')) activeContent = htmlSourceWrap;
+   if (htmlCssWrap && htmlCssWrap.style.display === 'block') activeContent = htmlCssWrap;
+   
+   if (!activeContent) return;
+
+   const minH = window.innerHeight - 102;
+   const contentH = activeContent.scrollHeight;
+   const totalH = contentH + 42; 
+   const targetH = Math.max(minH, totalH);
+   
+   edLayout.style.height = targetH + 'px';
+   updateScrollbarsLogic(); // Refresh markdown conditional scrollbar
+}
+window.addEventListener('resize', alignLayoutHeight);
+
+// ── Conditional Scrollbar & Floating Horizontal ───────────────
+let fhCancelled = false;
+const fhScroll = document.getElementById('floating-h-scroll');
+const fhTrack = document.getElementById('fh-track');
+const fhThumb = document.getElementById('fh-thumb');
+
+function updateScrollbarsLogic() {
+  // 1. Show markdown scrollbar only if it's taller than preview
+  if (mdInput.scrollHeight > previewScroll.scrollHeight) {
+    mdInput.classList.add('show-scrollbar');
+  } else {
+    mdInput.classList.remove('show-scrollbar');
+  }
+
+  // 2. Floating horizontal scrollbar logic
+  if (fhCancelled) {
+    fhScroll.style.display = 'none';
+    previewScroll.classList.add('show-scrollbar');
+    return;
+  }
+
+  const hOverflow = previewScroll.scrollWidth > previewScroll.clientWidth;
+  if (hOverflow) {
+    fhScroll.style.display = 'flex';
+    const ratio = previewScroll.clientWidth / previewScroll.scrollWidth;
+    fhThumb.style.width = Math.max(40, ratio * fhTrack.clientWidth) + 'px';
+    const maxScroll = previewScroll.scrollWidth - previewScroll.clientWidth;
+    const scrRatio = maxScroll > 0 ? previewScroll.scrollLeft / maxScroll : 0;
+    const trackSpace = fhTrack.clientWidth - fhThumb.clientWidth;
+    fhThumb.style.left = (scrRatio * trackSpace) + 'px';
+  } else {
+    fhScroll.style.display = 'none';
+  }
+}
+
+// Draggable thumb logic
+let isDraggingFH = false;
+let startX = 0;
+let startScrollLeft = 0;
+
+fhThumb.addEventListener('mousedown', (e) => {
+  isDraggingFH = true;
+  startX = e.clientX;
+  startScrollLeft = previewScroll.scrollLeft;
+  document.body.style.userSelect = 'none';
+  fhThumb.style.background = 'var(--ed-accent2)';
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDraggingFH) return;
+  const trackSpace = fhTrack.clientWidth - fhThumb.clientWidth;
+  const delta = e.clientX - startX;
+  const scrollRatioDelta = delta / trackSpace;
+  const maxScroll = previewScroll.scrollWidth - previewScroll.clientWidth;
+  previewScroll.scrollLeft = startScrollLeft + (scrollRatioDelta * maxScroll);
+});
+
+document.addEventListener('mouseup', () => {
+  if (isDraggingFH) {
+    isDraggingFH = false;
+    document.body.style.userSelect = '';
+    fhThumb.style.background = 'var(--ed-accent)';
+  }
+});
+
+// Click track to jump
+fhTrack.addEventListener('click', (e) => {
+  if (e.target === fhThumb) return;
+  const rect = fhTrack.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const ratio = clickX / rect.width;
+  const maxScroll = previewScroll.scrollWidth - previewScroll.clientWidth;
+  previewScroll.scrollLeft = ratio * maxScroll;
+});
+
+// Cancel functionality
+document.getElementById('fh-cancel').addEventListener('click', () => {
+  fhCancelled = true;
+  updateScrollbarsLogic();
+});
+
+previewScroll.addEventListener('scroll', updateScrollbarsLogic);
+window.addEventListener('resize', updateScrollbarsLogic);
+setInterval(updateScrollbarsLogic, 500);
+
+window.addEventListener('resize', throttle(() => updateGutter(), 100));
+
+// Highlight bar position: simple math using measured line height.
+// Each logical line occupies exactly one lineHeight slot in the gutter
+// (the number appears at the top of the line's first visual row).
+function getLineTops() {
+  const content = mdInput.value;
+  const lh      = getLineHeightFast();
+  const pt      = parseFloat(getComputedStyle(mdInput).paddingTop);
+  const lines   = content.split('\n');
+  const tops    = [];
+  for (let i = 0; i <= lines.length; i++) {
+    tops.push(pt + i * lh);
+  }
+  return tops;
+}
+
+function highlightEditorLine(lineNum) {
+  const lines      = mdInput.value.split('\n');
+  const targetLine = Math.min(Math.max(lineNum, 0), lines.length - 1);
+  const lh         = getLineHeightFast();
+  const top        = lineIndexToY(targetLine, lines);
+
+  hlLine.style.left    = '0';
+  hlLine.style.top     = top + 'px';
+  hlLine.style.height  = lh + 'px';
+  hlLine.style.opacity = (top + lh > 0 && top < mdInput.clientHeight) ? '1' : '0';
+}
+
+// ── Tab switching (3 tabs) ─────────────────
+
+
+// Preview tab
+document.getElementById('btn-preview-tab').addEventListener('click', () => {
+  document.getElementById('btn-preview-tab').classList.add('active');
+  document.getElementById('btn-source-tab').classList.remove('active');
+  document.getElementById('btn-htmlcss-tab').classList.remove('active');
+  
+  // Preview দেখান
+  document.getElementById('preview-scroll').style.display = 'block';
+  // Raw HTML লুকান
+  document.getElementById('html-source-wrap').classList.remove('visible');
+  document.getElementById('html-source-wrap').style.display = 'none';
+  // HTML+CSS লুকান
+  const htmlCssWrap = document.getElementById('html-css-wrap');
+  if (htmlCssWrap) htmlCssWrap.style.display = 'none';
+});
+
+// Raw HTML tab
+document.getElementById('btn-source-tab').addEventListener('click', () => {
+  document.getElementById('btn-source-tab').classList.add('active');
+  document.getElementById('btn-preview-tab').classList.remove('active');
+  document.getElementById('btn-htmlcss-tab').classList.remove('active');
+  
+  // Preview লুকান
+  document.getElementById('preview-scroll').style.display = 'none';
+  // Raw HTML দেখান
+  document.getElementById('html-source-wrap').classList.add('visible');
+  document.getElementById('html-source-wrap').style.display = 'block';
+  // HTML+CSS লুকান
+  const htmlCssWrap = document.getElementById('html-css-wrap');
+  if (htmlCssWrap) htmlCssWrap.style.display = 'none';
+});
+
+// HTML+CSS tab
+document.getElementById('btn-htmlcss-tab').addEventListener('click', () => {
+  document.getElementById('btn-htmlcss-tab').classList.add('active');
+  document.getElementById('btn-preview-tab').classList.remove('active');
+  document.getElementById('btn-source-tab').classList.remove('active');
+  
+  // Preview লুকান
+  document.getElementById('preview-scroll').style.display = 'none';
+  // Raw HTML লুকান
+  document.getElementById('html-source-wrap').classList.remove('visible');
+  document.getElementById('html-source-wrap').style.display = 'none';
+  // HTML+CSS দেখান
+  const htmlCssWrap = document.getElementById('html-css-wrap');
+  if (htmlCssWrap) htmlCssWrap.style.display = 'block';
+});
+
+// ── Preview Wrap Toggle ─────────────────────────
+let previewWrapOn = false;
+const rightPane = document.getElementById('right-pane');
+document.getElementById('btn-preview-wrap').addEventListener('click', () => {
+  previewWrapOn = !previewWrapOn;
+  if(previewWrapOn) {
+    rightPane.classList.add('wrap-active');
+    document.getElementById('btn-preview-wrap').classList.add('active');
+  } else {
+    rightPane.classList.remove('wrap-active');
+    document.getElementById('btn-preview-wrap').classList.remove('active');
+  }
+});
+
+// ── Layout Toggle ───────────────────────────────
+let layoutMode = 0; // 0=Split, 1=Editor Only, 2=Preview Only
+document.getElementById('btn-layout-toggle').addEventListener('click', () => {
+  const leftPane = document.getElementById('left-pane');
+  
+  layoutMode = (layoutMode + 1) % 3;
+  
+  if (layoutMode === 0) {
+    leftPane.style.display = 'flex';
+    rightPane.style.display = 'flex';
+  } else if (layoutMode === 1) {
+    leftPane.style.display = 'flex';
+    rightPane.style.display = 'none';
+  } else if (layoutMode === 2) {
+    leftPane.style.display = 'none';
+    rightPane.style.display = 'flex';
+  }
+  
+  // Trigger resize to update canvas gutter and mc overaly
+  requestAnimationFrame(() => {
+    updateGutter();
+    if (mcCursors.length) renderMCOverlay();
+  });
+});
+
+
+
+// ── Toolbar: wrap buttons ────────────────────
+document.querySelectorAll('[data-wrap]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const w = btn.dataset.wrap, we = btn.dataset.wrapEnd;
+    const s = mdInput.selectionStart, e = mdInput.selectionEnd;
+    const sel = mdInput.value.slice(s, e) || 'text';
+    mdInput.value = mdInput.value.slice(0,s) + w + sel + we + mdInput.value.slice(e);
+    mdInput.focus({ preventScroll: true });
+    mdInput.setSelectionRange(s+w.length, s+w.length+sel.length);
+    render();
+  });
+});
+
+// ── Toolbar: prefix buttons ──────────────────
+document.querySelectorAll('[data-prefix]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const prefix = btn.dataset.prefix;
+    const s = mdInput.selectionStart;
+    const ls = mdInput.value.lastIndexOf('\n', s-1) + 1;
+    mdInput.value = mdInput.value.slice(0,ls) + prefix + mdInput.value.slice(ls);
+    mdInput.focus({ preventScroll: true });
+    const np = ls + prefix.length;
+    mdInput.setSelectionRange(np, np);
+    render();
+  });
+});
+
+// ── Clear ────────────────────────────────────
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!mdInput.value.trim()) return;
+  if (confirm('Clear all content?')) { mdInput.value = ''; render(); }
+});
+
+
+// Copy HTML (raw only)
+document.getElementById('btn-copy-html-raw').addEventListener('click', async () => {
+  const md = mdInput.value;
+  if (!md.trim()) {
+    showToast('Nothing to copy');
+    return;
+  }
+  
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ markdown: md })
+    });
+    const data = await res.json();
+    
+    if (data.error) throw new Error(data.error);
+    
+    await navigator.clipboard.writeText(data.html);
+    showToast('HTML copied!');
+  } catch {
+    showToast('Copy failed');
+  }
+});
+
+
+// ── Copy HTML (with CSS) ─────────────────────
+document.getElementById('btn-copy-html').addEventListener('click', async () => {
+  const md = mdInput.value;
+  
+  try {
+    let html = '';
+    
+    if (md.trim()) {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markdown: md })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      html = data.html;
+    }
+    
+    const fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+      padding: 7px 11px;
+      font-weight: 600;
+      text-align: left;
+    }
+    .md-preview td {
+      border: 1px solid var(--ed-border);
+      padding: 6px 11px;
+    }
+    .md-preview tr:nth-child(even) td {
+      background: var(--ed-surface2);
+    }
+    .md-preview img {
+      max-width: 100%;
+      border-radius: var(--ed-radius);
+    }
+    .md-preview input[type=checkbox] {
+      margin-right: 5px;
+      accent-color: var(--ed-accent);
+    }
+    .math-block { display: block; overflow-x: auto; margin: 1.2em 0; padding: 10px 0; text-align: center; }
+    .math-inline { display: inline; }
+    .katex-display { margin: 0; }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"><\/script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\\\[',right:'\\\\]',display:true},{left:'\\\\(',right:'\\\\)',display:false}],throwOnError:false})"><\/script>
+  <title>Sophmark Document</title>
+<\/head>
+<body>
+  <div class="md-preview">${html}</div>
+<\/body>
+<\/html>`;
+    
+    await navigator.clipboard.writeText(fullHtml);
+    showToast('HTML with styles copied!');
+    
+  } catch {
+    showToast('Copy failed');
+  }
+});
+
+// ── Downloads ────────────────────────────────
+document.getElementById('btn-dl-md').addEventListener('click', () => {
+  dl('document.md', mdInput.value, 'text/markdown');
+  showToast('Markdown downloaded');
+});
+
+
+// Download .html (raw HTML, no CSS)
+document.getElementById('btn-dl-html-raw').addEventListener('click', async () => {
+  const md = mdInput.value;
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ markdown: md })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    
+    dl('document.html', data.html, 'text/html');
+    showToast('HTML downloaded');
+  } catch {
+    showToast('Download failed');
+  }
+});
+
+
+document.getElementById('btn-dl-html').addEventListener('click', async () => {
+  const md = mdInput.value;
+  if (!md.trim()) {
+    showToast('Nothing to download');
+    return;
+  }
+  
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ markdown: md })
+    });
+    const data = await res.json();
+    
+    if (data.error) throw new Error(data.error);
+    
+    const full = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <title>Document</title>
+  <style>\n${customCss.value.trim()}\n  <\/style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"><\/script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\\\[',right:'\\\\]',display:true},{left:'\\\\(',right:'\\\\)',display:false}],throwOnError:false})"><\/script>
+<\/head>
+<body>
+  <div class="md-preview">${data.html}<\/div>
+<\/body>
+<\/html>`;
+
+    dl('document.html', full, 'text/html');
+    showToast('HTML downloaded');
+    
+  } catch {
+    showToast('Download failed');
+  }
+});
+
+
+
+
+
+function dl(name, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], {type}));
+  a.download = name; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+
+// ── Custom CSS ───────────────────────────────
+const DEFAULT_PREVIEW_CSS = `/*
+  ===========================================
+  PREVIEW CUSTOM CSS
+  -------------------------------------------
+  You can modify these styles to change how
+  your document looks when previewed or exported.
+  These will be included exactly as written
+  when you click "Download .html+css" or 
+  "Copy HTML+CSS".
+  ===========================================
+*/
+
+/* --- Basic Variables & Base Setup --- */
+:root {
+  --ed-bg:        #f7f7f5;
+  --ed-surface:   #ffffff;
+  --ed-surface2:  #f0efec;
+  --ed-border:    #e2e0db;
+  --ed-border2:   #d0cdc6;
+  --ed-text:      #1a1916;
+  --ed-text2:     #6b6860;
+  --ed-text3:     #9e9b94;
+  --ed-accent:    #1a6b3a;
+  --ed-accent-s:  #e8f5ee;
+  --ed-radius:    6px;
+  --ed-mono:      'DM Mono', monospace;
+  --ed-sans:      'DM Sans', sans-serif;
+}
+body {
+  font-family: var(--ed-sans);
+  background: var(--ed-bg);
+  color: var(--ed-text);
+  margin: 0;
+}
+
+/* --- Container for the Markdown Content --- */
+.md-preview {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+/* --- Headings --- */
+.md-preview h1, .md-preview h2, .md-preview h3,
+.md-preview h4, .md-preview h5, .md-preview h6 {
+  font-family: var(--ed-sans);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ed-text);
+  margin-top: 1.5em;
+  margin-bottom: .45em;
+}
+.md-preview h1 {
+  font-size: 1.85em;
+  border-bottom: 2px solid var(--ed-border);
+  padding-bottom: .3em;
+  margin-top: .5em;
+}
+.md-preview h2 {
+  font-size: 1.4em;
+  border-bottom: 1px solid var(--ed-border);
+  padding-bottom: .2em;
+}
+.md-preview h3 { font-size: 1.15em; }
+
+/* --- Paragraphs & Links --- */
+.md-preview p {
+  margin-bottom: .85em;
+  line-height: 1.75;
+  color: var(--ed-text);
+}
+.md-preview a {
+  color: var(--ed-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* --- Inline Text Elements --- */
+.md-preview strong { font-weight: 600; }
+.md-preview em { color: var(--ed-text2); }
+.md-preview del { color: var(--ed-text3); }
+.md-preview hr {
+  border: none;
+  border-top: 1px solid var(--ed-border2);
+  margin: 1.6em 0;
+}
+
+/* --- Blockquotes --- */
+.md-preview blockquote {
+  border-left: 3px solid var(--ed-accent);
+  margin: 1em 0;
+  padding: 9px 15px;
+  background: var(--ed-accent-s);
+  border-radius: 0 var(--ed-radius) var(--ed-radius) 0;
+  color: var(--ed-text2);
+  font-style: italic;
+}
+
+/* --- Lists --- */
+.md-preview ul, .md-preview ol {
+  padding-left: 1.4em;
+  margin-bottom: .85em;
+}
+.md-preview li {
+  margin-bottom: .25em;
+  line-height: 1.65;
+}
+
+/* --- Code Block & Inline Code --- */
+.md-preview code {
+  font-family: var(--ed-mono);
+  font-size: .87em;
+  background: var(--ed-surface2);
+  border: 1px solid var(--ed-border);
+  border-radius: 4px;
+  padding: .13em .38em;
+  color: var(--ed-accent);
+}
+.md-preview pre {
+  background: var(--ed-surface2);
+  border: 1px solid var(--ed-border);
+  border-radius: 8px;
+  padding: 15px 18px;
+  overflow-x: auto;
+  margin-bottom: .9em;
+}
+.md-preview pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: .84em;
+  color: var(--ed-text);
+  line-height: 1.65;
+}
+
+/* --- Tables --- */
+.md-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: .9em;
+  font-size: .9em;
+}
+.md-preview th {
+  background: var(--ed-surface2);
+  border: 1px solid var(--ed-border);
+  padding: 7px 11px;
+  font-weight: 600;
+  text-align: left;
+}
+.md-preview td {
+  border: 1px solid var(--ed-border);
+  padding: 6px 11px;
+}
+.md-preview tr:nth-child(even) td {
+  background: var(--ed-surface2);
+}
+
+/* --- Images & Checkboxes --- */
+.md-preview img {
+  max-width: 100%;
+  border-radius: var(--ed-radius);
+}
+.md-preview input[type=checkbox] {
+  margin-right: 5px;
+  accent-color: var(--ed-accent);
+}
+
+/* --- Math Equations --- */
+.md-preview .math-block {
+  display: block;
+  overflow-x: auto;
+  margin: 1.2em 0;
+  padding: 10px 0;
+  text-align: center;
+}
+.math-inline { display: inline; }
+.katex-display { margin: 0; }`;
+
+// Pre-populate with default CSS
+customCss.value = DEFAULT_PREVIEW_CSS;
+userCssTag.textContent = DEFAULT_PREVIEW_CSS;
+
+document.getElementById('btn-custom-css').addEventListener('click', () => {
+  cssPanel.classList.toggle('open');
+});
+document.getElementById('css-close').addEventListener('click', () => cssPanel.classList.remove('open'));
+customCss.addEventListener('input', () => userCssTag.textContent = customCss.value);
+
+// Close CSS panel on Escape (when textarea is focused)
+customCss.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { cssPanel.classList.remove('open'); mdInput.focus(); }
+});
+
+// ── Theme toggle ─────────────────────────────
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('sophmark-theme', isDark ? 'light' : 'dark');
+}
+const savedTheme = localStorage.getItem('sophmark-theme');
+// Default to dark on this page unless user has explicitly chosen light
+document.documentElement.setAttribute('data-theme', savedTheme || 'dark');
+
+// Redraw gutter whenever data-theme changes (theme toggle)
+new MutationObserver(() => updateGutter()).observe(document.documentElement, {
+  attributes: true, attributeFilter: ['data-theme']
+});
+
+// ── Toast ────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+mdInput.addEventListener('input', () => {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(render, 250);
+});
+
+// ── Keyboard Shortcuts & Autocomplete ───────
+mdInput.addEventListener('keydown', (e) => {
+  const ta = mdInput;
+  const s = ta.selectionStart, end = ta.selectionEnd;
+  const val = ta.value;
+  const hasSelection = s !== end;
+
+  // Helper: replace selection and set cursor
+  function replace(newVal, cursorStart, cursorEnd) {
+    ta.value = newVal;
+    ta.selectionStart = cursorStart;
+    ta.selectionEnd = cursorEnd !== undefined ? cursorEnd : cursorStart;
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(render, 250);
+  }
+
+  // Helper: get line start/end for a position
+  function lineStart(pos) { return val.lastIndexOf('\n', pos - 1) + 1; }
+  function lineEnd(pos) { const i = val.indexOf('\n', pos); return i === -1 ? val.length : i; }
+  function currentLine(pos) { return val.slice(lineStart(pos), lineEnd(pos)); }
+
+  // Helper: wrap selection or word with markers
+  function wrapWith(open, close) {
+    close = close || open;
+    if (hasSelection) {
+      const sel = val.slice(s, end);
+      replace(val.slice(0, s) + open + sel + close + val.slice(end), s + open.length, end + open.length);
+    } else {
+      replace(val.slice(0, s) + open + close + val.slice(s), s + open.length);
+    }
+  }
+
+  // ── Ctrl+B: Bold ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'b') {
+    e.preventDefault();
+    wrapWith('**', '**');
+    return;
+  }
+
+  // ── Ctrl+I: Italic ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'i') {
+    e.preventDefault();
+    wrapWith('*', '*');
+    return;
+  }
+
+  // ── Ctrl+K: Inline code ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'k') {
+    e.preventDefault();
+    wrapWith('`', '`');
+    return;
+  }
+
+  // ── Ctrl+/: Toggle line comment (<!-- --> style for md) ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === '/') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    const le = lineEnd(s);
+    const line = val.slice(ls, le);
+    let newLine, newCursor;
+    if (line.startsWith('<!-- ') && line.endsWith(' -->')) {
+      newLine = line.slice(5, -4);
+      newCursor = s - 5 < ls ? ls : s - 5;
+    } else {
+      newLine = '<!-- ' + line + ' -->';
+      newCursor = s + 5;
+    }
+    replace(val.slice(0, ls) + newLine + val.slice(le), newCursor);
+    return;
+  }
+
+  // ── Ctrl+Shift+K: Delete line ──
+  if (e.ctrlKey && e.shiftKey && !e.altKey && (e.key === 'K' || e.key === 'k')) {
+    e.preventDefault();
+    const ls = lineStart(s);
+    const le = lineEnd(s);
+    let newVal, newCursor;
+    if (le < val.length) {
+      // line has a newline after it — remove line + trailing newline
+      newVal = val.slice(0, ls) + val.slice(le + 1);
+      newCursor = Math.min(ls, newVal.length);
+    } else if (ls > 0) {
+      // last line — remove preceding newline + line
+      newVal = val.slice(0, ls - 1);
+      newCursor = newVal.length;
+    } else {
+      // only line
+      newVal = '';
+      newCursor = 0;
+    }
+    replace(newVal, newCursor);
+    return;
+  }
+
+  // ── Ctrl+Enter: Insert line below ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'Enter') {
+    e.preventDefault();
+    const le = lineEnd(s);
+    replace(val.slice(0, le) + '\n' + val.slice(le), le + 1);
+    return;
+  }
+
+  // ── Ctrl+Shift+Enter: Insert line above ──
+  if (e.ctrlKey && e.shiftKey && !e.altKey && e.key === 'Enter') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    replace(val.slice(0, ls) + '\n' + val.slice(ls), ls + 1);
+    return;
+  }
+
+  // ── Alt+↑: Move line up ──
+  if (e.altKey && !e.ctrlKey && !e.shiftKey && e.key === 'ArrowUp') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    if (ls === 0) return;
+    const le = lineEnd(s);
+    const prevLs = lineStart(ls - 1);
+    const curLine = val.slice(ls, le);
+    const prevLine = val.slice(prevLs, ls - 1);
+    const newVal = val.slice(0, prevLs) + curLine + '\n' + prevLine + val.slice(le);
+    replace(newVal, prevLs + (s - ls));
+    return;
+  }
+
+  // ── Alt+↓: Move line down ──
+  if (e.altKey && !e.ctrlKey && !e.shiftKey && e.key === 'ArrowDown') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    const le = lineEnd(s);
+    if (le === val.length) return;
+    const nextLe = lineEnd(le + 1);
+    const curLine = val.slice(ls, le);
+    const nextLine = val.slice(le + 1, nextLe);
+    const newVal = val.slice(0, ls) + nextLine + '\n' + curLine + val.slice(nextLe);
+    replace(newVal, ls + nextLine.length + 1 + (s - ls));
+    return;
+  }
+
+  // ── Shift+Alt+↓: Copy line down ──
+  if (e.altKey && e.shiftKey && !e.ctrlKey && e.key === 'ArrowDown') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    const le = lineEnd(s);
+    const curLine = val.slice(ls, le);
+    const newVal = val.slice(0, le) + '\n' + curLine + val.slice(le);
+    replace(newVal, le + 1 + (s - ls));
+    return;
+  }
+
+  // ── Shift+Alt+↑: Copy line up ──
+  if (e.altKey && e.shiftKey && !e.ctrlKey && e.key === 'ArrowUp') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    const le = lineEnd(s);
+    const curLine = val.slice(ls, le);
+    const newVal = val.slice(0, ls) + curLine + '\n' + val.slice(ls);
+    replace(newVal, s);
+    return;
+  }
+
+  // ── Ctrl+L: Select current line ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === 'l') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    const le = lineEnd(s);
+    ta.selectionStart = ls;
+    ta.selectionEnd = le;
+    return;
+  }
+
+  // ── Ctrl+]: Indent line ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === ']') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    replace(val.slice(0, ls) + '  ' + val.slice(ls), s + 2);
+    return;
+  }
+
+  // ── Ctrl+[: Outdent line ──
+  if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key === '[') {
+    e.preventDefault();
+    const ls = lineStart(s);
+    const line = val.slice(ls);
+    const spaces = line.match(/^( {1,2}|\t)/);
+    if (spaces) {
+      const n = spaces[0].length;
+      replace(val.slice(0, ls) + val.slice(ls + n), Math.max(ls, s - n));
+    }
+    return;
+  }
+
+  // ── Tab: Indent / autocomplete list ──
+  if (e.key === 'Tab' && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+    if (e.shiftKey) {
+      // Shift+Tab: outdent
+      const ls = lineStart(s);
+      const line = val.slice(ls);
+      const spaces = line.match(/^( {1,2}|\t)/);
+      if (spaces) {
+        const n = spaces[0].length;
+        replace(val.slice(0, ls) + val.slice(ls + n), Math.max(ls, s - n));
+      }
+    } else {
+      replace(val.slice(0, s) + '  ' + val.slice(end), s + 2);
+    }
+    return;
+  }
+
+  // ── Enter: Auto-continue lists & autocomplete ──
+  if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+    const ls = lineStart(s);
+    const line = val.slice(ls, s);
+
+    // Auto-continue unordered list: "- ", "* ", "+ "
+    const ulMatch = line.match(/^(\s*)([-*+] (?:\[[ x]\] )?)/);
+    if (ulMatch) {
+      // If line only has the prefix, remove it (end the list)
+      if (line.trim() === ulMatch[2].trim()) {
+        e.preventDefault();
+        replace(val.slice(0, ls) + val.slice(s), ls);
+        return;
+      }
+      e.preventDefault();
+      const prefix = ulMatch[1] + ulMatch[2].replace(/\[x\] /, '[ ] ');
+      replace(val.slice(0, s) + '\n' + prefix + val.slice(end), s + 1 + prefix.length);
+      return;
+    }
+
+    // Auto-continue ordered list: "1. ", "2. " etc.
+    const olMatch = line.match(/^(\s*)(\d+)\. /);
+    if (olMatch) {
+      if (line.trim() === olMatch[2] + '. ') {
+        e.preventDefault();
+        replace(val.slice(0, ls) + val.slice(s), ls);
+        return;
+      }
+      e.preventDefault();
+      const nextNum = parseInt(olMatch[2], 10) + 1;
+      const prefix = olMatch[1] + nextNum + '. ';
+      replace(val.slice(0, s) + '\n' + prefix + val.slice(end), s + 1 + prefix.length);
+      return;
+    }
+
+    // Auto-continue blockquote: "> "
+    const bqMatch = line.match(/^(\s*> )/);
+    if (bqMatch) {
+      if (line.trim() === '>') {
+        e.preventDefault();
+        replace(val.slice(0, ls) + val.slice(s), ls);
+        return;
+      }
+      e.preventDefault();
+      const prefix = bqMatch[1];
+      replace(val.slice(0, s) + '\n' + prefix + val.slice(end), s + 1 + prefix.length);
+      return;
+    }
+  }
+
+  // ── Autocomplete pairs ──
+  const PAIRS = { '(': ')', '[': ']', '{': '}' };
+  const CLOSERS = new Set([')', ']', '}']);
+
+  // Skip over closing bracket if already there
+  if (CLOSERS.has(e.key) && !e.ctrlKey && !e.altKey && val[s] === e.key) {
+    e.preventDefault();
+    ta.selectionStart = ta.selectionEnd = s + 1;
+    return;
+  }
+
+  // Auto-close brackets
+  if (PAIRS[e.key] && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+    const close = PAIRS[e.key];
+    if (hasSelection) {
+      replace(val.slice(0, s) + e.key + val.slice(s, end) + close + val.slice(end), s + 1, end + 1);
+    } else {
+      replace(val.slice(0, s) + e.key + close + val.slice(s), s + 1);
+    }
+    return;
+  }
+
+  // Auto-close markdown pairs: **, *, `, ~~, _
+  const MD_PAIRS = ['**', '*', '`', '~~', '_'];
+  if (e.key === '*' && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+    // Check if next char is also * (for **)
+    const nextChar = val[s];
+    if (nextChar === '*') {
+      // skip over
+      ta.selectionStart = ta.selectionEnd = s + 1;
+      return;
+    }
+    if (hasSelection) {
+      replace(val.slice(0, s) + '*' + val.slice(s, end) + '*' + val.slice(end), s + 1, end + 1);
+    } else {
+      replace(val.slice(0, s) + '**' + val.slice(s), s + 1);
+    }
+    return;
+  }
+
+  if (e.key === '`' && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+    if (val[s] === '`' && !hasSelection) {
+      ta.selectionStart = ta.selectionEnd = s + 1;
+      return;
+    }
+    if (hasSelection) {
+      replace(val.slice(0, s) + '`' + val.slice(s, end) + '`' + val.slice(end), s + 1, end + 1);
+    } else {
+      replace(val.slice(0, s) + '``' + val.slice(s), s + 1);
+    }
+    return;
+  }
+
+  if (e.key === '_' && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+    if (val[s] === '_' && !hasSelection) {
+      ta.selectionStart = ta.selectionEnd = s + 1;
+      return;
+    }
+    if (hasSelection) {
+      replace(val.slice(0, s) + '_' + val.slice(s, end) + '_' + val.slice(end), s + 1, end + 1);
+    } else {
+      replace(val.slice(0, s) + '__' + val.slice(s), s + 1);
+    }
+    return;
+  }
+
+  // Backspace: remove paired char
+  if (e.key === 'Backspace' && !hasSelection && !e.ctrlKey && !e.altKey) {
+    const prev = val[s - 1], next = val[s];
+    const allPairs = { '(': ')', '[': ']', '{': '}', '`': '`', '*': '*', '_': '_' };
+    if (prev && allPairs[prev] === next) {
+      e.preventDefault();
+      replace(val.slice(0, s - 1) + val.slice(s + 1), s - 1);
+      return;
+    }
+  }
+});
+
+// ════════════════════════════════════════════════════════════
+// ADVANCED EDITOR FEATURES
+// ════════════════════════════════════════════════════════════
+
+// ── Line Numbers (canvas-based, pixel-perfect) ───────────────
+const edGutter       = document.getElementById('ed-gutter');
+const edGutterCanvas = document.getElementById('ed-gutter-canvas');
+const edGutterCtx    = edGutterCanvas.getContext('2d');
+
+function updateGutter() {
+  const lh    = getLineHeightFast();
+  const pt    = parseFloat(getComputedStyle(mdInput).paddingTop);
+  const lines = mdInput.value.split('\n');
+  const total = lines.length;
+  const pos   = mdInput.selectionStart;
+  let activeLine = 0, counted = 0;
+  for (let i = 0; i < lines.length; i++) {
+    counted += lines[i].length + 1;
+    if (counted > pos) { activeLine = i; break; }
+  }
+  const dpr = window.devicePixelRatio || 1;
+  const w   = edGutter.clientWidth;
+  
+  // Back to native bounds
+  const h   = edGutter.clientHeight;
+  
+  if (w === 0 || h === 0) return;
+  if (edGutterCanvas.width !== Math.round(w * dpr) || edGutterCanvas.height !== Math.round(h * dpr)) {
+    edGutterCanvas.width  = Math.round(w * dpr);
+    edGutterCanvas.height = Math.round(h * dpr);
+    edGutterCanvas.style.width  = w + 'px';
+    edGutterCanvas.style.height = h + 'px';
+    edGutterCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const cs       = getComputedStyle(document.documentElement);
+  const bgColor  = getComputedStyle(edGutter).backgroundColor;
+  const dimColor = cs.getPropertyValue('--ed-text3').trim();
+  const actColor = cs.getPropertyValue('--ed-accent').trim();
+  const taStyle  = getComputedStyle(mdInput);
+  const fontSize = parseFloat(taStyle.fontSize) * 0.78;
+  const rightPad = 6;
+  edGutterCtx.fillStyle = bgColor;
+  edGutterCtx.fillRect(0, 0, w, h);
+  
+  const scrollTop = mdInput.scrollTop;
+
+  if (!wordWrapOn) {
+    // Fast path: no wrap — pure math, no DOM mirror needed
+    const firstVisible = Math.max(0, Math.floor((scrollTop - pt) / lh));
+    const lastVisible  = Math.min(total - 1, Math.ceil((scrollTop + h - pt) / lh));
+    for (let i = firstVisible; i <= lastVisible; i++) {
+      const y        = pt + i * lh - scrollTop;
+      const baseline = y + (lh + fontSize * 0.75) / 2;
+      edGutterCtx.fillStyle = (i === activeLine) ? actColor : dimColor;
+      edGutterCtx.font      = (i === activeLine ? '600 ' : '500 ') + fontSize + 'px ' + taStyle.fontFamily;
+      edGutterCtx.textAlign = 'right';
+      edGutterCtx.fillText(i + 1, w - rightPad, baseline);
+    }
+  } else {
+    // Wrap path: use canvas font measurement (fast) instead of DOM mirror
+    const fmCtx = getFMCtx();
+    const availW = mdInput.clientWidth
+      - parseFloat(taStyle.paddingLeft)
+      - parseFloat(taStyle.paddingRight);
+    let y = pt - scrollTop;
+    for (let i = 0; i < total; i++) {
+      const lineW = fmCtx.measureText(lines[i]).width;
+      const rows  = Math.max(1, Math.ceil(lineW / availW));
+      const rowH  = rows * lh;
+      // Only draw if visible
+      if (y + rowH >= 0 && y <= h) {
+        const baseline = y + (lh + fontSize * 0.75) / 2;
+        edGutterCtx.fillStyle = (i === activeLine) ? actColor : dimColor;
+        edGutterCtx.font      = (i === activeLine ? '600 ' : '500 ') + fontSize + 'px ' + taStyle.fontFamily;
+        edGutterCtx.textAlign = 'right';
+        edGutterCtx.fillText(i + 1, w - rightPad, baseline);
+      }
+      y += rowH;
+      if (y > h) break; // past visible area, stop early
+    }
+  }
+}
+
+mdInput.addEventListener('scroll', throttle(updateGutter, 16));
+mdInput.addEventListener('keyup',  scheduleGutter);
+mdInput.addEventListener('click',  scheduleGutter);
+mdInput.addEventListener('select', scheduleGutter);
+mdInput.addEventListener('input',  scheduleGutter);
+
+// ── Word Wrap Toggle ─────────────────────────────────────────
+let wordWrapOn = true;
+const btnWordwrap = document.getElementById('btn-wordwrap');
+btnWordwrap.classList.add('active');
+btnWordwrap.addEventListener('click', () => {
+  wordWrapOn = !wordWrapOn;
+  mdInput.style.whiteSpace = wordWrapOn ? 'pre-wrap' : 'pre';
+  mdInput.style.overflowX  = wordWrapOn ? 'hidden' : 'auto';
+  btnWordwrap.classList.toggle('active', wordWrapOn);
+  // Redraw everything that depends on line positions
+  requestAnimationFrame(() => {
+    updateGutter();
+    if (mcCursors.length) renderMCOverlay();
+    if (highlightEditorLine._lastLine != null) highlightEditorLine(highlightEditorLine._lastLine);
+  });
+});
+
+// ── Find / Replace ───────────────────────────────────────────
+const findPanel       = document.getElementById('find-panel');
+const fpFind          = document.getElementById('fp-find');
+const fpReplace       = document.getElementById('fp-replace');
+const fpCount         = document.getElementById('fp-count');
+const fpCase          = document.getElementById('fp-case');
+const fpRegex         = document.getElementById('fp-regex');
+const fpWord          = document.getElementById('fp-word');
+const fpReplaceRow    = document.getElementById('fp-replace-row');
+const fpToggleReplace = document.getElementById('fp-toggle-replace');
+
+let findMatches = [];
+let findCurrent = -1;
+
+function buildFindRegex() {
+  let q = fpFind.value;
+  if (!q) return null;
+  try {
+    if (!fpRegex.checked) q = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (fpWord.checked)   q = '\\b' + q + '\\b';
+    return new RegExp(q, fpCase.checked ? 'g' : 'gi');
+  } catch { return null; }
+}
+
+function runFind() {
+  const re = buildFindRegex();
+  findMatches = [];
+  if (!re) { fpCount.textContent = ''; return; }
+  const val = mdInput.value;
+  let m;
+  while ((m = re.exec(val)) !== null) {
+    findMatches.push({ start: m.index, end: m.index + m[0].length });
+    if (findMatches.length > 5000) break;
+  }
+  fpCount.textContent = findMatches.length
+    ? (Math.min(findCurrent + 1, findMatches.length)) + '/' + findMatches.length
+    : 'No results';
+  if (findCurrent >= findMatches.length) findCurrent = findMatches.length - 1;
+}
+
+function findNav(dir) {
+  runFind();
+  if (!findMatches.length) return;
+  findCurrent = (findCurrent + dir + findMatches.length) % findMatches.length;
+  const m = findMatches[findCurrent];
+  mdInput.focus();
+  mdInput.setSelectionRange(m.start, m.end);
+  const linesBefore = mdInput.value.slice(0, m.start).split('\n').length - 1;
+  mdInput.scrollTop = Math.max(0, linesBefore * getLineHeightFast() - mdInput.clientHeight / 2);
+  fpCount.textContent = (findCurrent + 1) + '/' + findMatches.length;
+}
+
+function openFind(withReplace) {
+  findPanel.classList.add('open');
+  fpReplaceRow.style.display = withReplace ? 'flex' : 'none';
+  fpFind.focus();
+  fpFind.select();
+  const sel = mdInput.value.slice(mdInput.selectionStart, mdInput.selectionEnd);
+  if (sel && !sel.includes('\n')) fpFind.value = sel;
+  runFind();
+}
+
+function closeFind() {
+  findPanel.classList.remove('open');
+  mdInput.focus();
+  findMatches = [];
+  findCurrent = -1;
+  fpCount.textContent = '';
+}
+
+document.getElementById('btn-find').addEventListener('click', () => openFind(false));
+document.getElementById('fp-close').addEventListener('click', closeFind);
+document.getElementById('fp-next').addEventListener('click', () => findNav(1));
+document.getElementById('fp-prev').addEventListener('click', () => findNav(-1));
+fpFind.addEventListener('input',  () => { findCurrent = -1; runFind(); });
+fpCase.addEventListener('change', () => { findCurrent = -1; runFind(); });
+fpRegex.addEventListener('change',() => { findCurrent = -1; runFind(); });
+fpWord.addEventListener('change', () => { findCurrent = -1; runFind(); });
+
+fpFind.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter')  { e.preventDefault(); findNav(e.shiftKey ? -1 : 1); }
+  if (e.key === 'Escape') closeFind();
+});
+fpReplace.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeFind();
+});
+fpToggleReplace.addEventListener('click', () => {
+  const isOpen = fpReplaceRow.style.display !== 'none';
+  fpReplaceRow.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) fpReplace.focus();
+});
+
+document.getElementById('fp-replace-one').addEventListener('click', () => {
+  runFind();
+  if (!findMatches.length) return;
+  if (findCurrent < 0) findCurrent = 0;
+  const m   = findMatches[findCurrent];
+  const rep = fpReplace.value;
+  mdInput.value = mdInput.value.slice(0, m.start) + rep + mdInput.value.slice(m.end);
+  mdInput.setSelectionRange(m.start, m.start + rep.length);
+  findCurrent = -1;
+  runFind();
+  clearTimeout(renderTimer); renderTimer = setTimeout(render, 250);
+});
+
+document.getElementById('fp-replace-all').addEventListener('click', () => {
+  const re = buildFindRegex();
+  if (!re) return;
+  mdInput.value = mdInput.value.replace(re, fpReplace.value);
+  findCurrent = -1;
+  runFind();
+  clearTimeout(renderTimer); renderTimer = setTimeout(render, 250);
+  showToast('Replaced ' + findMatches.length + ' occurrences');
+});
+
+document.getElementById('fp-all').addEventListener('click', () => {
+  runFind();
+  if (!findMatches.length) return;
+  mcCursors = findMatches.map(m => ({ start: m.start, end: m.end }));
+  mcActive  = 0;
+  mdInput.setSelectionRange(findMatches[0].start, findMatches[0].end);
+  renderMCOverlay();
+  closeFind();
+  showToast(findMatches.length + ' selections');
+});
+
+// ── Go to Line ───────────────────────────────────────────────
+const gotoPanel = document.getElementById('goto-panel');
+const gotoInput = document.getElementById('goto-input');
+
+function openGoto() {
+  gotoPanel.classList.add('open');
+  gotoInput.value = '';
+  gotoInput.focus();
+}
+function closeGoto() {
+  gotoPanel.classList.remove('open');
+  mdInput.focus();
+}
+gotoInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const n = parseInt(gotoInput.value, 10);
+    if (!isNaN(n) && n > 0) {
+      const lines  = mdInput.value.split('\n');
+      const target = Math.min(n - 1, lines.length - 1);
+      let pos = 0;
+      for (let i = 0; i < target; i++) pos += lines[i].length + 1;
+      mdInput.setSelectionRange(pos, pos);
+      mdInput.scrollTop = Math.max(0, target * getLineHeightFast() - mdInput.clientHeight / 2);
+      scheduleGutter();
+    }
+    closeGoto();
+  }
+  if (e.key === 'Escape') closeGoto();
+});
+
+// ── Mirror-div helper: char offset → {x, y, h} in textarea coords ──────────
+// The mirror div replicates textarea layout. Key insight for wrap mode:
+// - mirror must NOT clip (overflow:visible, height:auto) so all wrapped lines
+//   are laid out at their true positions
+// - we then subtract scrollTop ourselves to get viewport-relative coords
+(function buildMirror() {
+  const mirror = document.createElement('div');
+  mirror.id = 'mc-mirror';
+  Object.assign(mirror.style, {
+    position:      'absolute',
+    top:           '0',
+    left:          '0',
+    visibility:    'hidden',
+    pointerEvents: 'none',
+    overflow:      'visible',   // must NOT clip — content taller than textarea
+    whiteSpace:    'pre-wrap',
+    wordBreak:     'break-word',
+    boxSizing:     'border-box',
+  });
+  mdInput.parentElement.appendChild(mirror);
+  window._mcMirror = mirror;
+}());
+
+function syncMirrorStyles() {
+  const m  = window._mcMirror;
+  const cs = getComputedStyle(mdInput);
+  // Width must match exactly so line-wrapping happens at the same column
+  m.style.width         = mdInput.offsetWidth  + 'px';
+  // Height: auto so content isn't clipped in wrap mode
+  m.style.height        = 'auto';
+  m.style.fontFamily    = cs.fontFamily;
+  m.style.fontSize      = cs.fontSize;
+  m.style.fontWeight    = cs.fontWeight;
+  m.style.lineHeight    = cs.lineHeight;
+  m.style.letterSpacing = cs.letterSpacing;
+  m.style.paddingTop    = cs.paddingTop;
+  m.style.paddingRight  = cs.paddingRight;
+  m.style.paddingBottom = cs.paddingBottom;
+  m.style.paddingLeft   = cs.paddingLeft;
+  m.style.borderTop     = cs.borderTop;
+  m.style.borderRight   = cs.borderRight;
+  m.style.borderBottom  = cs.borderBottom;
+  m.style.borderLeft    = cs.borderLeft;
+  m.style.tabSize       = cs.tabSize;
+  m.style.whiteSpace    = wordWrapOn ? 'pre-wrap' : 'pre';
+}
+
+function offsetToRect(offset) {
+  const m   = window._mcMirror;
+  syncMirrorStyles();
+  const val = mdInput.value;
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  const before = esc(val.slice(0, offset));
+  const after  = esc(val.slice(offset));
+  m.innerHTML  = before + '<span id="mc-caret">\u200b</span>' + after;
+  // Do NOT set m.scrollTop — mirror is not scrolled, we subtract scrollTop manually
+  const caret  = m.querySelector('#mc-caret');
+  const cr     = caret.getBoundingClientRect();
+  const mr     = m.getBoundingClientRect();
+  return {
+    x: cr.left - mr.left,
+    // Subtract textarea scrollTop so result is in viewport (textarea-client) coords
+    y: (cr.top - mr.top) - mdInput.scrollTop,
+    h: getLineHeight(),
+  };
+}
+
+// ── Multi-Cursor Engine ──────────────────────────────────────
+// mcCursors: array of { start, end }  (start===end = collapsed)
+// The textarea's native selection always tracks mcCursors[mcActive].
+let mcCursors = [];
+let mcActive  = 0;
+const mcOverlay = document.getElementById('mc-overlay');
+
+function clearMC() {
+  mcCursors = [];
+  mcOverlay.innerHTML = '';
+}
+
+function renderMCOverlay() {
+  if (!mcCursors.length) { mcOverlay.innerHTML = ''; return; }
+  // Position the overlay to cover the textarea exactly
+  const ta   = mdInput;
+  const taR  = ta.getBoundingClientRect();
+  const parR = mcOverlay.parentElement.getBoundingClientRect();
+  mcOverlay.style.left   = (taR.left - parR.left) + 'px';
+  mcOverlay.style.top    = (taR.top  - parR.top)  + 'px';
+  mcOverlay.style.width  = taR.width  + 'px';
+  mcOverlay.style.height = taR.height + 'px';
+
+  const lh  = getLineHeight();
+  const val = ta.value;
+  let html  = '';
+
+  mcCursors.forEach((cur) => {
+    const s  = Math.min(cur.start, cur.end);
+    const en = Math.max(cur.start, cur.end);
+
+    if (s !== en) {
+      // Draw selection highlight row-by-row using offsetToRect.
+      // Walk char by char through the selection, grouping chars on the same visual row.
+      let pos = s;
+      while (pos < en) {
+        const rowStart = offsetToRect(pos);
+        // Find the last char still on this visual row
+        let rowEnd = pos;
+        let nextPos = pos + 1;
+        while (nextPos <= en) {
+          const r = offsetToRect(nextPos);
+          if (Math.abs(r.y - rowStart.y) > lh * 0.5) break; // moved to next row
+          rowEnd = nextPos;
+          nextPos++;
+        }
+        const rowEndRect = offsetToRect(rowEnd);
+        const x1 = rowStart.x;
+        const x2 = (rowEnd === en && rowEndRect.x > x1) ? rowEndRect.x
+                   : (rowEnd < val.length && offsetToRect(rowEnd).y === rowStart.y)
+                     ? rowEndRect.x
+                     : ta.clientWidth - parseFloat(getComputedStyle(ta).paddingRight);
+        if (x2 > x1) {
+          html += '<div class="mc-selection" style="left:' + x1 + 'px;top:' + rowStart.y + 'px;width:' + (x2 - x1) + 'px;height:' + lh + 'px"></div>';
+        }
+        pos = rowEnd;
+        if (pos === en) break;
+      }
+    }
+
+    // Cursor bar
+    const caretOffset = (s === en) ? s : en;
+    const cr = offsetToRect(caretOffset);
+    html += '<div class="mc-cursor" style="left:' + cr.x + 'px;top:' + cr.y + 'px;height:' + cr.h + 'px"></div>';
+  });
+
+  mcOverlay.innerHTML = html;
+}
+
+// ── Click-position helper: mouse event → textarea char offset ───────────────
+function mouseEventToOffset(e) {
+  syncMirrorStyles();
+  const val   = mdInput.value;
+  const total = val.length;
+  if (total === 0) return 0;
+
+  const mr   = window._mcMirror.getBoundingClientRect();
+  const relX = e.clientX - mr.left;
+  // relY in mirror-content space: mouse Y relative to mirror top, plus scrollTop
+  // (mirror is not scrolled, so content above the viewport is at negative visual Y
+  //  but positive content Y = scrollTop + viewport-relative Y)
+  const relY = e.clientY - mr.top + mdInput.scrollTop;
+
+  if (!wordWrapOn) {
+    // Fast path: no wrap — use line-height math to find row, then binary search column
+    const lh  = getLineHeight();
+    const pt  = parseFloat(getComputedStyle(mdInput).paddingTop);
+    const row = Math.max(0, Math.floor((relY - pt) / lh));
+    const lines = val.split('\n');
+    const lineIdx = Math.min(row, lines.length - 1);
+    const line    = lines[lineIdx];
+    let lineStartOffset = 0;
+    for (let i = 0; i < lineIdx; i++) lineStartOffset += lines[i].length + 1;
+    let lo = 0, hi = line.length;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      const r   = offsetToRect(lineStartOffset + mid);
+      // offsetToRect returns viewport-relative y; convert back to content y
+      if (r.x <= relX) lo = mid; else hi = mid - 1;
+    }
+    if (lo < line.length) {
+      const r0 = offsetToRect(lineStartOffset + lo);
+      const r1 = offsetToRect(lineStartOffset + lo + 1);
+      if (Math.abs(r1.x - relX) < Math.abs(r0.x - relX)) lo++;
+    }
+    return lineStartOffset + lo;
+  }
+
+  // Wrap path: offsetToRect returns y in viewport coords (already scroll-adjusted).
+  // Convert mouse to the same space: viewport-relative y = e.clientY - taRect.top
+  const taRect = mdInput.getBoundingClientRect();
+  const vpRelY = e.clientY - taRect.top;
+
+  // Binary search: find offset whose viewport-y is just <= vpRelY
+  let lo = 0, hi = total;
+  while (lo < hi) {
+    const mid  = (lo + hi + 1) >> 1;
+    const rect = offsetToRect(mid);
+    if (rect.y <= vpRelY) lo = mid; else hi = mid - 1;
+  }
+  // Find the visual line boundaries at lo
+  const targetY = offsetToRect(lo).y;
+  let lineStart = lo;
+  while (lineStart > 0 && offsetToRect(lineStart - 1).y >= targetY) lineStart--;
+  let lineEnd = lo;
+  while (lineEnd < total && offsetToRect(lineEnd).y <= targetY) lineEnd++;
+  // Binary search within visual line for closest X
+  lo = lineStart; hi = lineEnd;
+  while (lo < hi) {
+    const mid  = (lo + hi + 1) >> 1;
+    const rect = offsetToRect(mid);
+    if (rect.x <= relX) lo = mid; else hi = mid - 1;
+  }
+  if (lo < lineEnd) {
+    const r0 = offsetToRect(lo);
+    const r1 = offsetToRect(lo + 1);
+    if (Math.abs(r1.x - relX) < Math.abs(r0.x - relX)) lo++;
+  }
+  return Math.min(lo, total);
+}
+
+// ── Alt+Click: add cursor ────────────────────────────────────
+mdInput.addEventListener('mousedown', (e) => {
+  if (!e.altKey) {
+    // Regular click: clear all extra cursors
+    if (mcCursors.length) clearMC();
+    return;
+  }
+  e.preventDefault();
+  const offset = mouseEventToOffset(e);
+
+  // On the very first Alt+Click, capture the current native caret as cursor #0
+  if (!mcCursors.length) {
+    const nativeCaret = mdInput.selectionStart;
+    mcCursors.push({ start: nativeCaret, end: mdInput.selectionEnd });
+    mcActive = 0;
+  }
+
+  // Toggle: remove if already there, else add
+  const existing = mcCursors.findIndex(c => c.start === offset && c.end === offset);
+  if (existing !== -1) {
+    mcCursors.splice(existing, 1);
+    if (!mcCursors.length) { clearMC(); return; }
+    mcActive = Math.min(mcActive, mcCursors.length - 1);
+  } else {
+    mcCursors.push({ start: offset, end: offset });
+    mcActive = mcCursors.length - 1;
+  }
+
+  // Keep the native caret on cursor #0 (the original position)
+  // so the primary cursor stays put — only the overlay shows the new ones
+  const primary = mcCursors[0];
+  mdInput.focus();
+  mdInput.setSelectionRange(primary.start, primary.end);
+  renderMCOverlay();
+});
+
+// Redraw overlay on scroll (cursor positions shift)
+mdInput.addEventListener('scroll', throttle(() => { if (mcCursors.length) renderMCOverlay(); }, 16));
+window.addEventListener('resize',  throttle(() => { if (mcCursors.length) renderMCOverlay(); }, 100));
+
+// ── Ctrl+Alt+↑/↓: add cursor above/below ────────────────────
+function addCursorAboveBelow(dir) {
+  const ref   = mcCursors.length ? mcCursors[0] : { start: mdInput.selectionStart, end: mdInput.selectionEnd };
+  const val   = mdInput.value;
+  const lines = val.split('\n');
+  let pos = 0, row = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (pos + lines[i].length >= ref.start) { row = i; break; }
+    pos += lines[i].length + 1;
+  }
+  const col       = ref.start - pos;
+  const targetRow = row + dir;
+  if (targetRow < 0 || targetRow >= lines.length) return;
+  let newPos = 0;
+  for (let i = 0; i < targetRow; i++) newPos += lines[i].length + 1;
+  newPos += Math.min(col, lines[targetRow].length);
+  // Capture original caret as cursor #0 on first use
+  if (!mcCursors.length) mcCursors.push({ start: ref.start, end: ref.end });
+  mcCursors.push({ start: newPos, end: newPos });
+  mcActive = mcCursors.length - 1;
+  // Keep native caret on cursor #0 so original position stays put
+  mdInput.setSelectionRange(mcCursors[0].start, mcCursors[0].end);
+  renderMCOverlay();
+}
+
+// ── Ctrl+D: add next occurrence ──────────────────────────────
+function addNextOccurrence() {
+  const val = mdInput.value;
+  const s   = mdInput.selectionStart;
+  const e   = mdInput.selectionEnd;
+  let word, searchFrom, ws;
+  if (s === e) {
+    const left  = val.slice(0, s).match(/\w+$/);
+    const right = val.slice(s).match(/^\w+/);
+    if (!left && !right) return;
+    word = (left ? left[0] : '') + (right ? right[0] : '');
+    ws   = s - (left ? left[0].length : 0);
+    searchFrom = ws + word.length;
+    if (!mcCursors.length) mcCursors.push({ start: ws, end: ws + word.length });
+  } else {
+    word = val.slice(s, e);
+    searchFrom = e;
+    if (!mcCursors.length) mcCursors.push({ start: s, end: e });
+  }
+  let idx = val.indexOf(word, searchFrom);
+  if (idx === -1) idx = val.indexOf(word, 0);
+  if (idx === -1 || mcCursors.some(c => c.start === idx)) return;
+  mcCursors.push({ start: idx, end: idx + word.length });
+  mcActive = mcCursors.length - 1;
+  // Keep native caret on cursor #0
+  mdInput.setSelectionRange(mcCursors[0].start, mcCursors[0].end);
+  renderMCOverlay();
+  showToast(mcCursors.length + ' selections');
+}
+
+// ── Ctrl+Shift+L: select all occurrences of selection ────────
+function selectAllOccurrences() {
+  const val = mdInput.value;
+  const s   = mdInput.selectionStart;
+  const e   = mdInput.selectionEnd;
+  if (s === e) return;
+  const word = val.slice(s, e);
+  mcCursors  = [];
+  let idx = 0;
+  while ((idx = val.indexOf(word, idx)) !== -1) {
+    mcCursors.push({ start: idx, end: idx + word.length });
+    idx += word.length;
+  }
+  if (!mcCursors.length) return;
+  mcActive = 0;
+  mdInput.setSelectionRange(mcCursors[0].start, mcCursors[0].end);
+  renderMCOverlay();
+  showToast(mcCursors.length + ' selections');
+}
+
+// ── Ctrl+F2: select all occurrences of word under cursor ─────
+function selectAllOccurrencesOfWord() {
+  const val   = mdInput.value;
+  const s     = mdInput.selectionStart;
+  const left  = val.slice(0, s).match(/\w+$/);
+  const right = val.slice(s).match(/^\w+/);
+  if (!left && !right) return;
+  const word = (left ? left[0] : '') + (right ? right[0] : '');
+  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re   = new RegExp('\\b' + escaped + '\\b', 'g');
+  mcCursors  = [];
+  let m;
+  while ((m = re.exec(val)) !== null) {
+    mcCursors.push({ start: m.index, end: m.index + m[0].length });
+  }
+  if (!mcCursors.length) return;
+  mcActive = 0;
+  mdInput.setSelectionRange(mcCursors[0].start, mcCursors[0].end);
+  renderMCOverlay();
+  showToast(mcCursors.length + ' selections');
+}
+
+// ── Multi-cursor typing (capture phase, runs first) ──────────
+mdInput.addEventListener('keydown', (e) => {
+  if (!mcCursors.length) return;
+  if (e.key === 'Escape') { clearMC(); return; }
+
+  const isPrintable = e.key.length === 1 && !e.ctrlKey && !e.metaKey;
+  const isEdit = isPrintable || e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Enter' || e.key === 'Tab';
+  if (!isEdit) return;
+
+  e.preventDefault();
+  const val = mdInput.value;
+
+  // Sort descending by end position so earlier edits don't shift later offsets
+  const order = mcCursors
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => Math.max(b.c.start, b.c.end) - Math.max(a.c.start, a.c.end));
+
+  let newVal     = val;
+  const updated  = mcCursors.map(c => ({ ...c }));
+
+  order.forEach(({ c: cur, i: idx }) => {
+    const s   = Math.min(cur.start, cur.end);
+    const en  = Math.max(cur.start, cur.end);
+    const sel = en - s;
+    let ins = '';
+    if      (e.key === 'Enter')     ins = '\n';
+    else if (e.key === 'Tab')       ins = '  ';
+    else if (e.key.length === 1)    ins = e.key;
+
+    if (sel > 0) {
+      // Replace selection
+      newVal = newVal.slice(0, s) + ins + newVal.slice(en);
+      const delta = ins.length - sel;
+      updated[idx] = { start: s + ins.length, end: s + ins.length };
+      updated.forEach((c, i) => { if (i !== idx && c.start > s) { updated[i] = { start: c.start + delta, end: c.end + delta }; } });
+    } else if (e.key === 'Backspace') {
+      if (s > 0) {
+        newVal = newVal.slice(0, s - 1) + newVal.slice(s);
+        updated[idx] = { start: s - 1, end: s - 1 };
+        updated.forEach((c, i) => { if (i !== idx && c.start >= s) { updated[i] = { start: c.start - 1, end: c.end - 1 }; } });
+      }
+    } else if (e.key === 'Delete') {
+      if (s < newVal.length) {
+        newVal = newVal.slice(0, s) + newVal.slice(s + 1);
+        updated.forEach((c, i) => { if (i !== idx && c.start > s) { updated[i] = { start: c.start - 1, end: c.end - 1 }; } });
+      }
+    } else if (ins) {
+      newVal = newVal.slice(0, s) + ins + newVal.slice(s);
+      updated[idx] = { start: s + ins.length, end: s + ins.length };
+      updated.forEach((c, i) => { if (i !== idx && c.start >= s) { updated[i] = { start: c.start + ins.length, end: c.end + ins.length }; } });
+    }
+  });
+
+  mdInput.value = newVal;
+  mcCursors = updated;
+  // Always keep native caret on cursor #0 (the original/primary position)
+  const primary = mcCursors[0] || mcCursors[mcActive];
+  mdInput.setSelectionRange(primary.start, primary.end);
+  renderMCOverlay();
+  scheduleGutter();
+  clearTimeout(renderTimer); renderTimer = setTimeout(render, 250);
+}, true);
+
+// ── All keyboard shortcuts ────────────────────────────────────
+mdInput.addEventListener('keydown', (e) => {
+  const ctrl  = e.ctrlKey || e.metaKey;
+  const shift = e.shiftKey;
+  const alt   = e.altKey;
+  const key   = e.key;
+
+  // ── Escape: close panels / clear cursors ──
+  if (key === 'Escape') {
+    if (findPanel.classList.contains('open')) { closeFind(); return; }
+    if (gotoPanel.classList.contains('open')) { closeGoto(); return; }
+    if (mcCursors.length) { clearMC(); return; }
+  }
+
+  // ── Ctrl+F: Find ──
+  if (ctrl && !shift && !alt && key === 'f') { e.preventDefault(); openFind(false); return; }
+  // ── Ctrl+H: Replace ──
+  if (ctrl && !shift && !alt && key === 'h') { e.preventDefault(); openFind(true); return; }
+  // ── F3 / Shift+F3: Find next/prev ──
+  if (key === 'F3' && !ctrl && !alt) {
+    e.preventDefault();
+    if (!findPanel.classList.contains('open')) openFind(false);
+    findNav(shift ? -1 : 1); return;
+  }
+  // ── Alt+Enter: Select all occurrences of find match ──
+  if (alt && !ctrl && !shift && key === 'Enter' && findPanel.classList.contains('open')) {
+    e.preventDefault();
+    runFind();
+    if (!findMatches.length) return;
+    mcCursors = findMatches.map(m => ({ start: m.start, end: m.end }));
+    mcActive  = 0;
+    mdInput.setSelectionRange(findMatches[0].start, findMatches[0].end);
+    renderMCOverlay();
+    closeFind();
+    showToast(findMatches.length + ' selections');
+    return;
+  }
+  // ── Ctrl+G: Go to line ──
+  if (ctrl && !shift && !alt && key === 'g') { e.preventDefault(); openGoto(); return; }
+  // ── Alt+Z: Word wrap ──
+  if (alt && !ctrl && !shift && (key === 'z' || key === 'Z')) { e.preventDefault(); btnWordwrap.click(); return; }
+  // ── Ctrl+Home: Beginning of file ──
+  if (ctrl && !shift && !alt && key === 'Home') {
+    e.preventDefault(); mdInput.setSelectionRange(0, 0); mdInput.scrollTop = 0; scheduleGutter(); return;
+  }
+  // ── Ctrl+End: End of file ──
+  if (ctrl && !shift && !alt && key === 'End') {
+    e.preventDefault();
+    const len = mdInput.value.length;
+    mdInput.setSelectionRange(len, len); mdInput.scrollTop = mdInput.scrollHeight; scheduleGutter(); return;
+  }
+  // ── Ctrl+↑: Scroll line up ──
+  if (ctrl && !shift && !alt && key === 'ArrowUp') {
+    e.preventDefault(); mdInput.scrollTop = Math.max(0, mdInput.scrollTop - getLineHeightFast()); scheduleGutter(); return;
+  }
+  // ── Ctrl+↓: Scroll line down ──
+  if (ctrl && !shift && !alt && key === 'ArrowDown') {
+    e.preventDefault(); mdInput.scrollTop = Math.min(mdInput.scrollHeight, mdInput.scrollTop + getLineHeightFast()); scheduleGutter(); return;
+  }
+  // ── Alt+PgUp: Scroll page up ──
+  if (alt && !ctrl && !shift && key === 'PageUp') {
+    e.preventDefault(); mdInput.scrollTop = Math.max(0, mdInput.scrollTop - mdInput.clientHeight); scheduleGutter(); return;
+  }
+  // ── Alt+PgDn: Scroll page down ──
+  if (alt && !ctrl && !shift && key === 'PageDown') {
+    e.preventDefault(); mdInput.scrollTop = Math.min(mdInput.scrollHeight, mdInput.scrollTop + mdInput.clientHeight); scheduleGutter(); return;
+  }
+  // ── Ctrl+D: Add next occurrence ──
+  if (ctrl && !shift && !alt && key === 'd') { e.preventDefault(); addNextOccurrence(); return; }
+  // ── Ctrl+Shift+L: Select all occurrences of selection ──
+  if (ctrl && shift && !alt && (key === 'l' || key === 'L')) { e.preventDefault(); selectAllOccurrences(); return; }
+  // ── Ctrl+F2: Select all occurrences of word ──
+  if (ctrl && !shift && !alt && key === 'F2') { e.preventDefault(); selectAllOccurrencesOfWord(); return; }
+  // ── Ctrl+Alt+↑: Add cursor above ──
+  if (ctrl && alt && !shift && key === 'ArrowUp') { e.preventDefault(); addCursorAboveBelow(-1); return; }
+  // ── Ctrl+Alt+↓: Add cursor below ──
+  if (ctrl && alt && !shift && key === 'ArrowDown') { e.preventDefault(); addCursorAboveBelow(1); return; }
+  // ── Ctrl+U: Undo last cursor ──
+  if (ctrl && !shift && !alt && key === 'u') {
+    if (mcCursors.length) { e.preventDefault(); mcCursors.pop(); if (!mcCursors.length) { clearMC(); } else { mcActive = mcCursors.length - 1; const p = mcCursors[mcActive]; mdInput.setSelectionRange(p.start, p.end); renderMCOverlay(); } return; }
+  }
+  // ── Shift+Alt+I: Cursor at end of each selected line ──
+  if (alt && shift && !ctrl && (key === 'i' || key === 'I')) {
+    e.preventDefault();
+    const selStart = mdInput.selectionStart, selEnd = mdInput.selectionEnd;
+    if (selStart === selEnd) return;
+    const selected = mdInput.value.slice(selStart, selEnd).split('\n');
+    mcCursors = [];
+    let off = selStart;
+    selected.forEach(line => {
+      mcCursors.push({ start: off + line.length, end: off + line.length });
+      off += line.length + 1;
+    });
+    mcActive = 0;
+    // Keep native caret on cursor #0
+    mdInput.setSelectionRange(mcCursors[0].start, mcCursors[0].end);
+    renderMCOverlay();
+    showToast(mcCursors.length + ' cursors');
+    return;
+  }
+  // ── Ctrl+Shift+\: Jump to matching bracket ──
+  if (ctrl && shift && !alt && key === '\\') {
+    e.preventDefault();
+    const val   = mdInput.value;
+    const pos   = mdInput.selectionStart;
+    const OPEN  = '([{';
+    const CLOSE = ')]}';
+    let sc, mc2, dir, sp;
+    const ch = val[pos], cp = val[pos - 1];
+    if      (OPEN.includes(ch))  { sc = ch;  mc2 = CLOSE[OPEN.indexOf(ch)];   dir =  1; sp = pos; }
+    else if (CLOSE.includes(ch)) { sc = ch;  mc2 = OPEN[CLOSE.indexOf(ch)];   dir = -1; sp = pos; }
+    else if (OPEN.includes(cp))  { sc = cp;  mc2 = CLOSE[OPEN.indexOf(cp)];   dir =  1; sp = pos - 1; }
+    else if (CLOSE.includes(cp)) { sc = cp;  mc2 = OPEN[CLOSE.indexOf(cp)];   dir = -1; sp = pos - 1; }
+    else return;
+    let depth = 0, i = sp;
+    while (i >= 0 && i < val.length) {
+      if (val[i] === sc) depth++;
+      else if (val[i] === mc2) { depth--; if (depth === 0) { mdInput.setSelectionRange(i, i); scheduleGutter(); return; } }
+      i += dir;
+    }
+    return;
+  }
+  scheduleGutter();
+});
+
+// ── Initial content ──────────────────────────
+mdInput.value =
+'# Sophmark ༼ つ ◕_◕ ༽つ Markdown to HTML\n\n' +
+'Write **Markdown** on the left, see live *HTML preview* on the right.\n\n' +
+'> \ud83d\udca1 Hover over any preview element to highlight its source line in the editor.\n\n' +
+'---\n\n' +
+'## Text Formatting\n\n' +
+'You can write **bold**, *italic*, ~~strikethrough~~, and `inline code` easily.\n\n' +
+'## Image\n\n' +
+'![Nanowakeword training graph](https://pub-812e108f164d4805821c37cb3d3810f1.r2.dev/images/common/training_performance_graph.png)\n\n' +
+'## Blockquote\n\n' +
+'> "Smart Markdown editor with auto-complete and coder-friendly shortcuts."\n\n' +
+'## Code Block\n\n' +
+'```python\n' +
+'from nanowakeword.trainer import train\n\n' +
+'args_list = [\n' +
+"    '--config_path', f'{config_path}',\n" +
+']\n\n' +
+'train(args_list)\n' +
+'```\n\n' +
+'## LaTeX Math Example\n\n' +
+'ISBL:\n' +
+'$$\n' +
+'\\mathcal{P}(x_i \\mid x_i \\in C_k, t) = \\frac{\\left(\\mathcal{L}_i^{(t-1)}\\right)^\\alpha + \\epsilon}{\\sum_{x_j \\in C_k} \\left[\\left(\\mathcal{L}_j^{(t-1)}\\right)^\\alpha + \\epsilon\\right]}\n' +
+'$$\n\n' +
+'## Task List\n\n' +
+'- [x] Write Markdown\n' +
+'- [x] See live preview\n' +
+'- [ ] Download as `.html` with css\n\n' +
+'## Table\n\n' +
+'| Syntax        | Output         |\n' +
+'|---------------|----------------|\n' +
+'| `**text**`    | **Bold**       |\n' +
+'| `*text*`      | *Italic*       |\n' +
+'| `# Heading`   | H1 Heading     |\n' +
+'| `[link](url)` | [Link](#)      |\n' +
+'| `![alt](url)` | Image          |\n\n' +
+'---\n\n' +
+'Made with \u2764\ufe0f by [Arcosoph](https://arcosoph.com)\n';
+
+render();
+
+document.fonts.ready.then(() => {
+  updateGutter();
+});
+
+setTimeout(() => {
+  updateGutter();
+}, 100);
+
+
+// Event listeners for tabs to fix layout height on switch
+document.getElementById('btn-preview-tab').addEventListener('click', () => setTimeout(alignLayoutHeight, 10));
+document.getElementById('btn-source-tab').addEventListener('click', () => setTimeout(alignLayoutHeight, 10));
+document.getElementById('btn-htmlcss-tab').addEventListener('click', () => setTimeout(alignLayoutHeight, 10));
+
+</script>
+
+<div id="footer-container"></div>
+
+<script src="js/components.js"></script>
+    <script src="js/search.js"></script>
+<script src="js/script.js"></script>
+<script type="module" src="js/auth-nav.js"></script>
+
+</body>
+</html>
