@@ -1,4 +1,4 @@
-# Sophmark — Online Markdown Editor
+# Sophmark — Markdown Editor (md to html+css)
 
 Try now:
 [Sophmark](https://arcosoph.com/sophmark)
@@ -15,7 +15,7 @@ You can:
 
 # Demo
 
-Write **Markdown** on the left, see a live *HTML preview* on the right.
+Write **Markdown** on the left, see live *HTML preview* on the right.
 
 > 💡 Hover over any preview element to highlight its source line in the editor.
 
@@ -31,7 +31,7 @@ You can write **bold**, *italic*, ~~strikethrough~~, and `inline code` easily.
 
 ## Blockquote
 
-> "The best tools get out of the way and let you think."
+> "Smart Markdown editor with auto-complete and coder-friendly shortcuts."
 
 ## Code Block
 
@@ -45,21 +45,29 @@ args_list = [
 train(args_list)
 ```
 
+## LaTeX Math Example
+
+ISBL:
+
+$$
+\mathcal{P}(x_i \mid x_i \in C_k, t) = \frac{\left(\mathcal{L}_i^{(t-1)}\right)^\alpha + \epsilon}{\sum_{x_j \in C_k} \left[\left(\mathcal{L}_j^{(t-1)}\right)^\alpha + \epsilon\right]}
+$$
+
 ## Task List
 
-* [x] Write Markdown
-* [x] See live preview
-* [ ] Download as `.html` with CSS
+- [x] Write Markdown
+- [x] See live preview
+- [ ] Download as `.html` with css
 
 ## Table
 
-| Syntax        | Output     |
-| ------------- | ---------- |
-| `**text**`    | **Bold**   |
-| `*text*`      | *Italic*   |
-| `# Heading`   | H1 Heading |
-| `[link](url)` | [Link](#)  |
-| `![alt](url)` | Image      |
+| Syntax        | Output         |
+|---------------|----------------|
+| `**text**`    | **Bold**       |
+| `*text*`      | *Italic*       |
+| `# Heading`   | H1 Heading     |
+| `[link](url)` | [Link](#)      |
+| `![alt](url)` | Image          |
 
 ---
 
