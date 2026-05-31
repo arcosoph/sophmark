@@ -615,6 +615,14 @@
   <div class="subbar-sep"></div>
   <span style="font-size:11px;color:var(--ed-text3);">powered by sophmark.js</span>
   <div class="subbar-right">
+    <button class="sub-btn" id="btn-theme-toggle" title="Toggle Dark/Light Mode">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"></path>
+      </svg>
+      Theme
+    </button>
+    <div class="subbar-sep"></div>
     <button class="sub-btn" id="btn-layout-toggle" title="Toggle Layout">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
       Layout
@@ -2170,6 +2178,8 @@ function toggleTheme() {
 const savedTheme = localStorage.getItem('sophmark-theme');
 // Default to dark on this page unless user has explicitly chosen light
 document.documentElement.setAttribute('data-theme', savedTheme || 'dark');
+
+document.getElementById('btn-theme-toggle').addEventListener('click', toggleTheme);
 
 // Redraw gutter whenever data-theme changes (theme toggle)
 new MutationObserver(() => updateGutter()).observe(document.documentElement, {
