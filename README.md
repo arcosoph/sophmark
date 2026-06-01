@@ -1,7 +1,10 @@
-# Sophmark — Markdown Editor (md to html+css)
+# Markdown to HTML+CSS (md2html+css)
 
-Try now:
-[Sophmark](https://arcosoph.com/sophmark)
+<p align="center">
+  <img src="https://pub-812e108f164d4805821c37cb3d3810f1.r2.dev/images/common/sophmark_example-arcosoph.com.png" alt="Sophmark Editor Interface" width="800">
+</p> 
+
+## Try now [Sophmark](https://arcosoph.com/sophmark) or Download [Sophmark Editor](https://github.com/arcosoph/sophmark/releases/download/v0.1.0/sophmark.html)
 
 You can:
 
@@ -10,10 +13,6 @@ You can:
 * Live preview your content
 * Developer support
 * Enjoy new updates regularly
-
----
-
-# Demo
 
 Write **Markdown** on the left, see live *HTML preview* on the right.
 
